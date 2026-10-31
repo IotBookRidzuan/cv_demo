@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>P15 Posture Detection · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css">
+<style>:root{--c:var(--bio)}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <a class="balik" href="../">← Semua projek</a>
+    <div class="tajuk"><small>Projek 15 · Kesihatan</small><h1>AI-Based Real-Time Posture Detection</h1></div>
+    <span class="pil" id="pil"><i></i>Sedia</span>
+  </header>
+  <div class="grid">
+    <div>
+      <div class="pentas cermin" id="pentas">
+        <video id="video" playsinline muted></video><canvas id="kanvas"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="tunggu" id="tunggu"><p>Duduk menghadap kamera supaya kepala dan kedua-dua bahu kelihatan.</p><button class="btn utama" id="mula" type="button">▶ Mula kamera</button></div>
+        <div class="amaranBesar" id="amaran">Betulkan postur anda</div>
+      </div>
+      <div class="kawal">
+        <button class="btn" id="kalib" type="button" disabled>🎯 Kalibrasi postur baik</button>
+        <button class="btn" id="tukar" type="button" disabled>🔄 Tukar kamera</button>
+        <label class="btn" for="fail">🎞 Guna fail video<input id="fail" type="file" accept="video/*"></label>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><h2>Skor postur</h2>
+        <div class="metrik"><div><b id="skor">--</b><span>skor (100 = baik)</span></div><div><b id="masaBuruk">0s</b><span>masa postur buruk</span></div>
+          <div><b id="condong">--</b><span>kecondongan bahu (°)</span></div><div><b id="kepala">--</b><span>kepala ke hadapan</span></div></div>
+        <div class="bar" style="margin-top:12px"><i id="barSkor"></i></div></section>
+      <section class="kad"><h2>Cara guna</h2><ol class="cara"><li>Tekan <b>Mula kamera</b> dan benarkan akses kamera.</li><li>Duduk tegak, kemudian tekan <b>Kalibrasi postur baik</b>.</li><li>Sistem memberi amaran jika anda membongkok atau condong lebih 5 saat.</li></ol></section>
+      <section class="kad"><h2>Rekod amaran</h2><div class="log" id="log"><p class="kosong">Belum ada amaran.</p></div></section>
+      <p class="privasi">Video diproses dalam peranti anda menggunakan MediaPipe Pose. Tiada imej dihantar ke mana-mana.</p>
+    </aside>
+  </div>
+</div>
+<script type="module">
+import { $, kamera, padanKanvas, bip, status, logTambah, fps, mediapipe } from "../common.js";
+const video = $("#video"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
+let pose = null, utils = null, asas = null, mulaBuruk = 0, jumBuruk = 0, tAkhir = performance.now(), lalu = -1, amaranOn = false;
+const kam = kamera({ video, pentas: $("#pentas"), onStatus: t => status(pil, t, "amaran"), onReady: sedia });
+async function muat() {
+  status(pil, "Memuat model…");
+  const { m, fs } = await mediapipe();
+  pose = await m.PoseLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task", delegate: "GPU" }, runningMode: "VIDEO", numPoses: 1 });
+  utils = new m.DrawingUtils(g); window.__C = m.PoseLandmarker.POSE_CONNECTIONS;
+}
+async function sedia() { $("#tunggu").hidden = true; ["#kalib", "#tukar"].forEach(s => $(s).disabled = false); if (!pose) await muat(); status(pil, "Mengesan", "ok"); if (!window.__jalan) { window.__jalan = true; requestAnimationFrame(gelung); } }
+$("#mula").onclick = async () => { bip(660, 60, .05); if (!await kam.mula()) return; };
+$("#tukar").onclick = () => kam.tukar();
+$("#fail").onchange = e => { const f = e.target.files[0]; if (f) kam.fail(f); };
+const sudut = (a, b) => Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+function ukur(L) {
+  const bk = L[11], bn = L[12], hidung = L[0], tk = L[7], tn = L[8];
+  const lebarBahu = Math.hypot(bn.x - bk.x, bn.y - bk.y) || 1, tengahBahuY = (bk.y + bn.y) / 2;
+  let condong = Math.abs(sudut(bn, bk)); if (condong > 90) condong = 180 - condong;
+  return { condong, leher: (tengahBahuY - hidung.y) / lebarBahu, kepalaZ: ((tk.z + tn.z) / 2 - (bk.z + bn.z) / 2), lebar: lebarBahu };
+}
+$("#kalib").onclick = () => { if (window.__ukur) { asas = { ...window.__ukur }; logTambah($("#log"), "Kalibrasi disimpan sebagai postur baik."); bip(990, 120, .08); } };
+function gelung() {
+  if (!kam.aktif) return requestAnimationFrame(gelung);
+  padanKanvas(kanvas, video);
+  if (video.readyState >= 2 && video.currentTime !== lalu && pose) {
+    lalu = video.currentTime; const now = performance.now(), r = pose.detectForVideo(video, now);
+    g.clearRect(0, 0, kanvas.width, kanvas.height);
+    if (r.landmarks && r.landmarks[0]) {
+      const L = r.landmarks[0], u = ukur(L); window.__ukur = u;
+      utils.drawConnectors(L, window.__C, { color: "rgba(69,211,166,.85)", lineWidth: 3 }); utils.drawLandmarks(L, { color: "#F2C14E", radius: 3 });
+      // skor: condong bahu + jarak kepala-bahu (membongkok) + kepala ke hadapan, berbanding kalibrasi
+      const b = asas || { condong: 0, leher: u.leher, kepalaZ: u.kepalaZ };
+      const pBahu = Math.max(0, u.condong - b.condong - 2) * 6, pLeher = Math.max(0, (b.leher - u.leher) / Math.max(.05, b.leher)) * 160, pZ = Math.max(0, (b.kepalaZ - u.kepalaZ) - .03) * 400;
+      const skor = Math.max(0, Math.min(100, Math.round(100 - pBahu - pLeher - pZ)));
+      $("#skor").textContent = asas ? skor : "--"; $("#barSkor").style.width = (asas ? skor : 0) + "%";
+      $("#condong").textContent = u.condong.toFixed(1); $("#kepala").textContent = asas ? (pZ > 10 || pLeher > 15 ? "Ya" : "Tidak") : "--";
+      const dt = (now - tAkhir) / 1000; tAkhir = now;
+      if (asas && skor < 65) { jumBuruk += dt; if (!mulaBuruk) mulaBuruk = now; if (now - mulaBuruk > 5000 && !amaranOn) { amaranOn = true; $("#amaran").classList.add("on"); status(pil, "Postur buruk", "bahaya"); bip(520, 300); logTambah($("#log"), `Postur buruk lebih 5 saat (skor ${skor}).`); } }
+      else { mulaBuruk = 0; if (amaranOn) { amaranOn = false; $("#amaran").classList.remove("on"); } status(pil, asas ? (skor < 80 ? "Perlu perhatian" : "Postur baik") : "Tekan Kalibrasi", asas ? (skor < 80 ? "amaran" : "ok") : ""); }
+      $("#masaBuruk").textContent = Math.round(jumBuruk) + "s";
+    } else status(pil, "Tiada orang dikesan", "amaran");
+    $("#hud").innerHTML = `<span>${kiraFps()} FPS</span><span>MediaPipe Pose</span>`;
+  }
+  requestAnimationFrame(gelung);
+}
+</script>
+</body>
+</html>

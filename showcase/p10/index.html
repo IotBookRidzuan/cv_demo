@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>P10 Theft Detection &amp; Alert · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css">
+<style>
+:root{--c:var(--rose)}
+.pentas.cermin video,.pentas.cermin canvas{transform:none}
+#kanvas{cursor:crosshair;touch-action:none}
+.log img{width:96px;border-radius:6px;flex:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <a class="balik" href="../">← Semua projek</a>
+    <div class="tajuk"><small>Projek 10 · Keselamatan</small><h1>Real-Time AI Theft Detection &amp; Alert</h1></div>
+    <span class="pil" id="pil"><i></i>Sedia</span>
+  </header>
+  <div class="grid">
+    <div>
+      <div class="pentas" id="pentas">
+        <video id="video" playsinline muted></video><canvas id="kanvas"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="tunggu" id="tunggu"><p>Letakkan barang berharga (beg, laptop, telefon) di hadapan kamera. Lukis zon perlindungan dengan menyeret di atas video.</p><button class="btn utama" id="mula" type="button">▶ Mula kamera</button></div>
+        <div class="amaranBesar" id="amaran">⚠ AMARAN KECURIAN</div>
+      </div>
+      <div class="kawal">
+        <button class="btn" id="tukar" type="button" disabled>🔄 Tukar kamera</button>
+        <button class="btn" id="kunci" type="button" disabled>🔒 Kunci zon (aktifkan pengawasan)</button>
+        <label class="btn" for="fail">🎞 Guna fail video<input id="fail" type="file" accept="video/*"></label>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><h2>Dalam zon perlindungan</h2>
+        <div class="metrik"><div><b id="barang">0</b><span>barang berharga</span></div><div><b id="orang">0</b><span>orang dalam zon</span></div>
+          <div><b id="nAmaran">0</b><span>amaran dicetuskan</span></div><div><b id="mod">Bebas</b><span>mod pengawasan</span></div></div></section>
+      <section class="kad"><h2>Cara guna</h2><ol class="cara"><li>Seret di atas video untuk melukis zon perlindungan.</li><li>Tekan <b>Kunci zon</b>. Sistem mengingati barang dalam zon.</li><li>Jika barang hilang semasa ada orang berhampiran, amaran berbunyi dan gambar bukti disimpan.</li></ol></section>
+      <section class="kad"><h2>Bukti kejadian</h2><div class="log" id="log"><p class="kosong">Belum ada kejadian.</p></div></section>
+      <p class="privasi">Video diproses dalam peranti anda menggunakan TensorFlow.js COCO-SSD. Gambar bukti kekal dalam pelayar ini sahaja.</p>
+    </aside>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script type="module">
+import { $, kamera, padanKanvas, bip, cakap, status, masa, fps } from "../common.js";
+const BERHARGA = { backpack: "Beg galas", handbag: "Beg tangan", suitcase: "Bagasi", laptop: "Laptop", "cell phone": "Telefon", book: "Buku", bottle: "Botol" };
+const video = $("#video"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
+let model = null, jalan = false, sibuk = false, zon = null, seret = null, dikunci = false, asas = {}, hilangSejak = {}, orangAkhir = 0, nAmaran = 0, amaranAkhir = 0;
+const kam = kamera({ video, pentas: $("#pentas"), onStatus: t => status(pil, t, "amaran"), onReady: sedia });
+async function sedia() { $("#tunggu").hidden = true; $("#tukar").disabled = $("#kunci").disabled = false; if (!model) { status(pil, "Memuat model…"); model = await cocoSsd.load(); } status(pil, "Lukis zon", ""); if (!jalan) { jalan = true; gelung(); } }
+$("#mula").onclick = () => { bip(660, 60, .05); kam.mula(); };
+$("#tukar").onclick = () => kam.tukar();
+$("#fail").onchange = e => { const f = e.target.files[0]; if (f) kam.fail(f); };
+// lukis zon (koordinat piksel video)
+function titikVideo(e) { const r = kanvas.getBoundingClientRect(), vw = kanvas.width, vh = kanvas.height, s = Math.min(r.width / vw, r.height / vh), ox = (r.width - vw * s) / 2, oy = (r.height - vh * s) / 2; return [Math.max(0, Math.min(vw, (e.clientX - r.left - ox) / s)), Math.max(0, Math.min(vh, (e.clientY - r.top - oy) / s))]; }
+kanvas.addEventListener("pointerdown", e => { if (dikunci) return; seret = titikVideo(e); zon = [...seret, ...seret]; kanvas.setPointerCapture(e.pointerId); });
+kanvas.addEventListener("pointermove", e => { if (!seret) return; const p = titikVideo(e); zon = [Math.min(seret[0], p[0]), Math.min(seret[1], p[1]), Math.max(seret[0], p[0]), Math.max(seret[1], p[1])]; });
+kanvas.addEventListener("pointerup", () => { seret = null; });
+$("#kunci").onclick = () => {
+  if (!zon || zon[2] - zon[0] < 20) { const w = kanvas.width, h = kanvas.height; zon = [w * .25, h * .3, w * .75, h * .9]; }
+  dikunci = !dikunci; $("#kunci").textContent = dikunci ? "🔓 Buka kunci zon" : "🔒 Kunci zon (aktifkan pengawasan)"; $("#mod").textContent = dikunci ? "Aktif" : "Bebas";
+  asas = dikunci ? { ...window.__dalam } : {}; hilangSejak = {};
+  status(pil, dikunci ? "Pengawasan aktif" : "Lukis zon", dikunci ? "ok" : ""); bip(dikunci ? 990 : 500, 120, .08);
+};
+const dalamZon = b => { if (!zon) return false; const cx = b[0] + b[2] / 2, cy = b[1] + b[3] / 2; return cx >= zon[0] && cx <= zon[2] && cy >= zon[1] && cy <= zon[3]; };
+const bertindih = b => zon && !(b[0] > zon[2] || b[0] + b[2] < zon[0] || b[1] > zon[3] || b[1] + b[3] < zon[1]);
+function bukti(teks) {
+  const now = performance.now(); if (now - amaranAkhir < 5000) return; amaranAkhir = now; nAmaran++; $("#nAmaran").textContent = nAmaran;
+  const c = document.createElement("canvas"); c.width = 320; c.height = Math.round(320 * kanvas.height / kanvas.width); const x = c.getContext("2d"); x.drawImage(video, 0, 0, c.width, c.height); x.drawImage(kanvas, 0, 0, c.width, c.height);
+  const log = $("#log"), k = log.querySelector(".kosong"); if (k) k.remove();
+  const d = document.createElement("div"); d.innerHTML = `<img alt="Gambar bukti"><span><time>${masa()}</time><br></span>`; d.querySelector("img").src = c.toDataURL("image/jpeg", .7); d.querySelector("span").append(teks); log.prepend(d);
+  $("#amaran").textContent = "⚠ " + teks; $("#amaran").classList.add("on"); status(pil, "AMARAN", "bahaya"); bip(880, 250, .3); setTimeout(() => bip(660, 250, .3), 300); setTimeout(() => bip(880, 250, .3), 600); cakap("Amaran. " + teks);
+  setTimeout(() => { $("#amaran").classList.remove("on"); if (dikunci) status(pil, "Pengawasan aktif", "ok"); }, 4000);
+}
+async function gelung() {
+  if (model && video.readyState >= 2 && !sibuk) {
+    sibuk = true; padanKanvas(kanvas, video); const w = kanvas.width, h = kanvas.height, now = performance.now();
+    const r = await model.detect(video, 30, .4); g.clearRect(0, 0, w, h); g.lineWidth = Math.max(2, w / 320); g.font = `600 ${Math.max(14, w / 48)}px system-ui`;
+    const dalam = {}; let orang = 0;
+    r.forEach(d => { const nama = BERHARGA[d.class], isOrang = d.class === "person"; if (!nama && !isOrang) return;
+      if (isOrang && bertindih(d.bbox)) orang++; if (nama && dalamZon(d.bbox)) dalam[d.class] = (dalam[d.class] || 0) + 1;
+      const c = isOrang ? "#5AA9FF" : "#F2C14E", [x, y, bw, bh] = d.bbox, t = (isOrang ? "Orang" : nama) + " " + Math.round(d.score * 100) + "%";
+      g.strokeStyle = c; g.strokeRect(x, y, bw, bh); const tw = g.measureText(t).width + 12, th = Math.max(20, w / 34); g.fillStyle = c; g.fillRect(x, Math.max(0, y - th), tw, th); g.fillStyle = "#04101a"; g.fillText(t, x + 6, Math.max(th - 6, y - 6)); });
+    window.__dalam = dalam; if (orang) orangAkhir = now;
+    $("#barang").textContent = Object.values(dalam).reduce((a, b) => a + b, 0); $("#orang").textContent = orang;
+    if (zon) { g.save(); g.setLineDash([12, 8]); g.lineWidth = Math.max(3, w / 220); g.strokeStyle = dikunci ? "#FF7A8A" : "#F2C14E"; g.strokeRect(zon[0], zon[1], zon[2] - zon[0], zon[3] - zon[1]); g.fillStyle = dikunci ? "rgba(255,122,138,.08)" : "rgba(242,193,78,.06)"; g.fillRect(zon[0], zon[1], zon[2] - zon[0], zon[3] - zon[1]); g.restore();
+      g.fillStyle = dikunci ? "#FF7A8A" : "#F2C14E"; g.fillText(dikunci ? "ZON DILINDUNGI" : "ZON (belum dikunci)", zon[0] + 8, zon[1] + Math.max(18, w / 40)); }
+    if (dikunci) {
+      Object.keys(asas).forEach(k => { const kurang = (dalam[k] || 0) < asas[k];
+        if (kurang) { hilangSejak[k] = hilangSejak[k] || now; if (now - hilangSejak[k] > 1500 && now - orangAkhir < 4000) { bukti(`${BERHARGA[k]} hilang dari zon semasa ada orang berhampiran`); asas[k] = dalam[k] || 0; delete hilangSejak[k]; } }
+        else delete hilangSejak[k]; });
+      Object.keys(dalam).forEach(k => { if (!(k in asas) || dalam[k] > asas[k]) asas[k] = dalam[k]; });
+    }
+    $("#hud").innerHTML = `<span>${kiraFps()} FPS</span><span>COCO-SSD</span>`;
+    sibuk = false;
+  }
+  requestAnimationFrame(gelung);
+}
+</script>
+</body>
+</html>

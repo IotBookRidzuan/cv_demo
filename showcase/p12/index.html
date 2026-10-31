@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>P12 Driver Fatigue Detection · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css">
+<style>:root{--c:var(--rose)}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <a class="balik" href="../">← Semua projek</a>
+    <div class="tajuk"><small>Projek 12 · Keselamatan jalan raya</small><h1>AI Driver Attentiveness &amp; Fatigue Detection</h1></div>
+    <span class="pil" id="pil"><i></i>Sedia</span>
+  </header>
+  <div class="grid">
+    <div>
+      <div class="pentas cermin" id="pentas">
+        <video id="video" playsinline muted></video><canvas id="kanvas"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="tunggu" id="tunggu"><p>Hadapkan wajah ke kamera seperti memandu. Cuba pejamkan mata 2 saat atau menguap untuk melihat amaran.</p><button class="btn utama" id="mula" type="button">▶ Mula kamera</button></div>
+        <div class="amaranBesar" id="amaran">⚠ MENGANTUK! Sila berehat</div>
+      </div>
+      <div class="kawal">
+        <button class="btn" id="tukar" type="button" disabled>🔄 Tukar kamera</button>
+        <button class="btn" id="reset" type="button" disabled>↺ Set semula kiraan</button>
+        <label class="btn" for="fail">🎞 Guna fail video<input id="fail" type="file" accept="video/*"></label>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><h2>Status pemandu</h2>
+        <div class="metrik"><div><b id="kelip">0</b><span>kelipan mata</span></div><div><b id="menguap">0</b><span>kali menguap</span></div>
+          <div><b id="perclos">0%</b><span>mata tertutup (60 saat)</span></div><div><b id="arah">--</b><span>arah pandangan</span></div></div>
+        <div style="margin-top:12px;display:grid;gap:6px"><span class="privasi">Tahap mata tertutup</span><div class="bar"><i id="barMata"></i></div></div></section>
+      <section class="kad"><h2>Logik amaran</h2><ol class="cara"><li>Mata tertutup lebih <b>1.5 saat</b> → amaran mengantuk.</li><li>Menguap <b>3 kali</b> dalam 2 minit → amaran letih.</li><li>Kepala berpaling lebih <b>3 saat</b> → amaran tidak fokus.</li></ol></section>
+      <section class="kad"><h2>Rekod amaran</h2><div class="log" id="log"><p class="kosong">Belum ada amaran.</p></div></section>
+      <p class="privasi">Video diproses dalam peranti anda menggunakan MediaPipe Face Landmarker. Tiada imej dihantar ke mana-mana.</p>
+    </aside>
+  </div>
+</div>
+<script type="module">
+import { $, kamera, padanKanvas, bip, cakap, status, logTambah, fps, mediapipe } from "../common.js";
+const video = $("#video"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
+let fl = null, utils = null, C = null, lalu = -1, jalan = false;
+let kelip = 0, tutup = false, mulaTutup = 0, uap = [], dalamUap = false, sampel = [], mulaPaling = 0, amaranOn = 0;
+const kam = kamera({ video, pentas: $("#pentas"), onStatus: t => status(pil, t, "amaran"), onReady: sedia });
+async function muat() {
+  status(pil, "Memuat model…");
+  const { m, fs } = await mediapipe();
+  fl = await m.FaceLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task", delegate: "GPU" }, runningMode: "VIDEO", numFaces: 1, outputFaceBlendshapes: true });
+  utils = new m.DrawingUtils(g); C = m.FaceLandmarker;
+}
+async function sedia() { $("#tunggu").hidden = true; $("#tukar").disabled = $("#reset").disabled = false; if (!fl) await muat(); status(pil, "Memantau", "ok"); if (!jalan) { jalan = true; requestAnimationFrame(gelung); } }
+$("#mula").onclick = () => { bip(660, 60, .05); kam.mula(); };
+$("#tukar").onclick = () => kam.tukar();
+$("#reset").onclick = () => { kelip = 0; uap = []; sampel = []; ["#kelip", "#menguap"].forEach(s => $(s).textContent = "0"); };
+$("#fail").onchange = e => { const f = e.target.files[0]; if (f) kam.fail(f); };
+function amaran(teks, suara) { const now = performance.now(); if (now - amaranOn < 4000) return; amaranOn = now; $("#amaran").textContent = "⚠ " + teks; $("#amaran").classList.add("on"); status(pil, teks, "bahaya"); bip(440, 350, .3); setTimeout(() => bip(440, 350, .3), 450); if (suara) cakap(suara); logTambah($("#log"), teks); setTimeout(() => $("#amaran").classList.remove("on"), 3000); }
+function gelung() {
+  padanKanvas(kanvas, video);
+  if (video.readyState >= 2 && video.currentTime !== lalu && fl) {
+    lalu = video.currentTime; const now = performance.now(), r = fl.detectForVideo(video, now);
+    g.clearRect(0, 0, kanvas.width, kanvas.height);
+    if (r.faceLandmarks && r.faceLandmarks[0]) {
+      const L = r.faceLandmarks[0], bs = {}; (r.faceBlendshapes[0] ? r.faceBlendshapes[0].categories : []).forEach(c => bs[c.categoryName] = c.score);
+      utils.drawConnectors(L, C.FACE_LANDMARKS_LEFT_EYE, { color: "#FF7A8A", lineWidth: 2 }); utils.drawConnectors(L, C.FACE_LANDMARKS_RIGHT_EYE, { color: "#FF7A8A", lineWidth: 2 });
+      utils.drawConnectors(L, C.FACE_LANDMARKS_LIPS, { color: "#F2C14E", lineWidth: 2 }); utils.drawConnectors(L, C.FACE_LANDMARKS_FACE_OVAL, { color: "rgba(255,255,255,.35)", lineWidth: 1 });
+      const mata = ((bs.eyeBlinkLeft || 0) + (bs.eyeBlinkRight || 0)) / 2, rahang = bs.jawOpen || 0;
+      $("#barMata").style.width = Math.round(mata * 100) + "%";
+      // kelipan & mata tertutup lama
+      const tertutup = mata > .55;
+      if (tertutup && !tutup) { tutup = true; mulaTutup = now; }
+      if (!tertutup && tutup) { tutup = false; if (now - mulaTutup < 500) { kelip++; $("#kelip").textContent = kelip; } }
+      if (tutup && now - mulaTutup > 1500) amaran("MENGANTUK! Sila berehat", "Amaran. Anda kelihatan mengantuk. Sila berhenti dan berehat.");
+      // PERCLOS 60 saat
+      sampel.push([now, tertutup ? 1 : 0]); while (sampel.length && now - sampel[0][0] > 60000) sampel.shift();
+      $("#perclos").textContent = Math.round(sampel.reduce((a, s) => a + s[1], 0) / sampel.length * 100) + "%";
+      // menguap
+      if (rahang > .6 && !dalamUap) { dalamUap = true; uap.push(now); }
+      if (rahang < .35) dalamUap = false;
+      uap = uap.filter(t => now - t < 120000); $("#menguap").textContent = uap.length;
+      if (uap.length >= 3) { amaran("LETIH: kerap menguap", "Anda kerap menguap. Sila berehat sebentar."); uap = []; }
+      // arah kepala (hidung berbanding tengah muka)
+      const hidung = L[1], kiri = L[234], kanan = L[454], nisbah = (hidung.x - kiri.x) / Math.max(.001, kanan.x - kiri.x);
+      const paling = nisbah < .3 || nisbah > .7; $("#arah").textContent = paling ? (nisbah < .3 ? "Sisi" : "Sisi") : "Depan";
+      if (paling) { if (!mulaPaling) mulaPaling = now; if (now - mulaPaling > 3000) amaran("TIDAK FOKUS: pandang ke hadapan", "Sila fokus ke hadapan."); } else mulaPaling = 0;
+      if (now - amaranOn > 3000) status(pil, "Pemandu berjaga", "ok");
+    } else { status(pil, "Wajah tidak dikesan", "amaran"); $("#arah").textContent = "--"; }
+    $("#hud").innerHTML = `<span>${kiraFps()} FPS</span><span>Face Landmarker</span>`;
+  }
+  requestAnimationFrame(gelung);
+}
+</script>
+</body>
+</html>

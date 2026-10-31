@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>P09 Smart Cattle Monitoring · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css">
+<style>:root{--c:var(--ese)}.sumber{display:none}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <a class="balik" href="../">← Semua projek</a>
+    <div class="tajuk"><small>Projek 09 · Pertanian pintar</small><h1>Smart Cattle Monitoring System</h1></div>
+    <span class="pil" id="pil"><i></i>Sedia</span>
+  </header>
+  <div class="grid">
+    <div>
+      <div class="pentas" id="pentas">
+        <video id="video" playsinline muted></video><img class="sumber" id="gambar" alt=""><canvas id="kanvas"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="tunggu" id="tunggu"><p>Halakan kamera ke ladang, atau muat naik video/gambar lembu untuk dikira.</p><div class="kawal" style="justify-content:center"><button class="btn utama" id="mula" type="button">▶ Mula kamera</button><label class="btn" for="fail0">🎞 Muat naik video/gambar<input id="fail0" type="file" accept="video/*,image/*"></label></div></div>
+      </div>
+      <div class="kawal">
+        <button class="btn" id="tukar" type="button" disabled>🔄 Tukar kamera</button>
+        <label class="btn" for="fail">🎞 Video/gambar lain<input id="fail" type="file" accept="video/*,image/*"></label>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><h2>Kiraan ternakan</h2>
+        <div class="metrik"><div><b id="lembu">0</b><span>lembu dalam bingkai</span></div><div><b id="maks">0</b><span>kiraan tertinggi</span></div>
+          <div><b id="lain">0</b><span>haiwan lain</span></div><div><b id="orang">0</b><span>orang</span></div></div></section>
+      <section class="kad"><h2>Cara ia berfungsi</h2><ol class="cara"><li>Model COCO-SSD mengesan objek dalam setiap bingkai.</li><li>Kelas <b>cow</b> dikira sebagai lembu; kambing, biri-biri dan kuda dikira sebagai haiwan lain.</li><li>Kiraan direkod setiap 10 saat untuk melihat pergerakan ternakan.</li></ol></section>
+      <section class="kad"><h2>Rekod kiraan</h2><div class="log" id="log"><p class="kosong">Belum ada rekod.</p></div></section>
+      <p class="privasi">Video diproses dalam peranti anda menggunakan TensorFlow.js COCO-SSD. Tiada imej dihantar ke mana-mana.</p>
+    </aside>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script type="module">
+import { $, kamera, padanKanvas, status, logTambah, fps } from "../common.js";
+const video = $("#video"), img = $("#gambar"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
+let model = null, jalan = false, sibuk = false, maks = 0, akhirLog = 0, modGambar = false;
+const kam = kamera({ video, pentas: $("#pentas"), onStatus: t => status(pil, t, "amaran"), onReady: () => { modGambar = false; img.style.display = "none"; video.style.display = ""; sedia(); } });
+async function sedia() { $("#tunggu").hidden = true; $("#tukar").disabled = false; if (!model) { status(pil, "Memuat model…"); model = await cocoSsd.load({ base: "lite_mobilenet_v2" }); } status(pil, "Mengira", "ok"); if (!jalan) { jalan = true; gelung(); } }
+$("#mula").onclick = () => kam.mula();
+$("#tukar").onclick = () => kam.tukar();
+function failDipilih(e) { const f = e.target.files[0]; if (!f) return;
+  if (f.type.startsWith("image/")) { kam.henti(); modGambar = true; video.style.display = "none"; img.style.display = "block"; img.onload = () => { sedia(); }; img.src = URL.createObjectURL(f); $("#pentas").classList.remove("cermin"); }
+  else { modGambar = false; img.style.display = "none"; video.style.display = ""; kam.fail(f); } }
+$("#fail").onchange = failDipilih; $("#fail0").onchange = failDipilih;
+const LAIN = ["sheep", "horse", "dog", "bird", "cat", "elephant"];
+async function gelung() {
+  const src = modGambar ? img : video, w = modGambar ? img.naturalWidth : video.videoWidth, h = modGambar ? img.naturalHeight : video.videoHeight;
+  if (model && w && !sibuk && (modGambar || video.readyState >= 2)) {
+    sibuk = true;
+    if (kanvas.width !== w || kanvas.height !== h) { kanvas.width = w; kanvas.height = h; }
+    const r = await model.detect(src, 30, .35); g.clearRect(0, 0, w, h);
+    let l = 0, a = 0, o = 0; g.lineWidth = Math.max(2, w / 300); g.font = `600 ${Math.max(14, w / 45)}px system-ui`;
+    r.forEach(d => { const jenis = d.class === "cow" ? "lembu" : LAIN.includes(d.class) ? "lain" : d.class === "person" ? "orang" : null; if (!jenis) return;
+      if (jenis === "lembu") l++; else if (jenis === "lain") a++; else o++;
+      const c = jenis === "lembu" ? "#F4A24C" : jenis === "orang" ? "#5AA9FF" : "#45D3A6", [x, y, bw, bh] = d.bbox, t = (jenis === "lembu" ? "Lembu" : d.class) + " " + Math.round(d.score * 100) + "%";
+      g.strokeStyle = c; g.strokeRect(x, y, bw, bh); const tw = g.measureText(t).width + 12, th = Math.max(20, w / 36); g.fillStyle = c; g.fillRect(x, Math.max(0, y - th), tw, th); g.fillStyle = "#04101a"; g.fillText(t, x + 6, Math.max(th - 6, y - 6)); });
+    $("#lembu").textContent = l; $("#lain").textContent = a; $("#orang").textContent = o; maks = Math.max(maks, l); $("#maks").textContent = maks;
+    const now = performance.now(); if (now - akhirLog > 10000) { akhirLog = now; logTambah($("#log"), `${l} lembu, ${a} haiwan lain dikesan.`); }
+    $("#hud").innerHTML = `<span>${modGambar ? "Gambar" : kiraFps() + " FPS"}</span><span>COCO-SSD</span>`;
+    sibuk = false;
+  }
+  setTimeout(() => requestAnimationFrame(gelung), modGambar ? 1000 : 0);
+}
+</script>
+</body>
+</html>

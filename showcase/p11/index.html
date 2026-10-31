@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>P11 Smart Sign Language · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css">
+<style>
+:root{--c:var(--violet)}
+.ayat{min-height:64px;padding:14px;border-radius:12px;background:var(--panel2);font:600 22px/1.35 var(--display)}
+.ayat:empty::before{content:"Ayat akan terbentuk di sini…";color:var(--dim);font:500 15px/1.4 var(--body)}
+.kini{display:flex;align-items:center;gap:14px}
+.kini b{font:700 34px/1 var(--display)}
+.peta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;font-size:13px}
+.peta div{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;background:var(--panel2)}
+.peta span{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas">
+    <a class="balik" href="../">← Semua projek</a>
+    <div class="tajuk"><small>Projek 11 · Inklusif</small><h1>AI Smart Sign Language System</h1></div>
+    <span class="pil" id="pil"><i></i>Sedia</span>
+  </header>
+  <div class="grid">
+    <div>
+      <div class="pentas cermin" id="pentas">
+        <video id="video" playsinline muted></video><canvas id="kanvas"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="tunggu" id="tunggu"><p>Tunjukkan tangan ke kamera. Tahan satu isyarat selama 1 saat untuk menambah perkataan.</p><button class="btn utama" id="mula" type="button">▶ Mula kamera</button></div>
+      </div>
+      <div class="kawal">
+        <button class="btn" id="tukar" type="button" disabled>🔄 Tukar kamera</button>
+        <button class="btn" id="sebut" type="button">🔊 Sebut ayat</button>
+        <button class="btn" id="padam" type="button">⌫ Padam</button>
+        <button class="btn" id="kosong" type="button">✕ Kosongkan</button>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><h2>Isyarat semasa</h2><div class="kini"><b id="isyarat">--</b><span class="privasi" id="yakin"></span></div><div class="bar" style="margin-top:10px"><i id="tahan"></i></div></section>
+      <section class="kad"><h2>Terjemahan</h2><div class="ayat" id="ayat"></div></section>
+      <section class="kad"><h2>Isyarat dikenali</h2><div class="peta" id="peta"></div><p class="privasi" style="margin:10px 0 0">Pemetaan isyarat kepada perkataan ini ialah contoh demo. Pasukan projek boleh menggantikannya dengan isyarat BIM yang dilatih sendiri.</p></section>
+      <p class="privasi">Video diproses dalam peranti anda menggunakan MediaPipe Gesture Recognizer. Tiada imej dihantar ke mana-mana.</p>
+    </aside>
+  </div>
+</div>
+<script type="module">
+import { $, kamera, padanKanvas, bip, cakap, status, fps, mediapipe } from "../common.js";
+const PETA = { Open_Palm: ["✋", "Hai"], Thumb_Up: ["👍", "Ya"], Thumb_Down: ["👎", "Tidak"], Victory: ["✌️", "Terima kasih"], Closed_Fist: ["✊", "Tunggu"], Pointing_Up: ["☝️", "Saya"], ILoveYou: ["🤟", "Sayang"] };
+$("#peta").innerHTML = Object.values(PETA).map(([e, w]) => `<div><b>${e}</b><span>${w}</span></div>`).join("");
+const video = $("#video"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
+let gr = null, utils = null, H = null, lalu = -1, jalan = false, calon = null, mulaCalon = 0, akhirTambah = "", masaAkhir = 0;
+const kam = kamera({ video, pentas: $("#pentas"), onStatus: t => status(pil, t, "amaran"), onReady: sedia });
+async function muat() {
+  status(pil, "Memuat model…");
+  const { m, fs } = await mediapipe();
+  gr = await m.GestureRecognizer.createFromOptions(fs, { baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task", delegate: "GPU" }, runningMode: "VIDEO", numHands: 1 });
+  utils = new m.DrawingUtils(g); H = m.GestureRecognizer.HAND_CONNECTIONS;
+}
+async function sedia() { $("#tunggu").hidden = true; $("#tukar").disabled = false; if (!gr) await muat(); status(pil, "Mengecam", "ok"); if (!jalan) { jalan = true; requestAnimationFrame(gelung); } }
+$("#mula").onclick = () => { bip(660, 60, .05); kam.mula(); };
+$("#tukar").onclick = () => kam.tukar();
+$("#sebut").onclick = () => { const t = $("#ayat").textContent.trim(); if (t) cakap(t); };
+$("#padam").onclick = () => { const w = $("#ayat").textContent.trim().split(" "); w.pop(); $("#ayat").textContent = w.join(" "); akhirTambah = ""; };
+$("#kosong").onclick = () => { $("#ayat").textContent = ""; akhirTambah = ""; };
+function gelung() {
+  padanKanvas(kanvas, video);
+  if (video.readyState >= 2 && video.currentTime !== lalu && gr) {
+    lalu = video.currentTime; const now = performance.now(), r = gr.recognizeForVideo(video, now);
+    g.clearRect(0, 0, kanvas.width, kanvas.height);
+    const gst = r.gestures && r.gestures[0] && r.gestures[0][0];
+    if (r.landmarks && r.landmarks[0]) { utils.drawConnectors(r.landmarks[0], H, { color: "#B59CFF", lineWidth: 4 }); utils.drawLandmarks(r.landmarks[0], { color: "#F2C14E", radius: 4 }); }
+    if (gst && PETA[gst.categoryName] && gst.score > .6) {
+      const [e, w] = PETA[gst.categoryName]; $("#isyarat").textContent = e + " " + w; $("#yakin").textContent = Math.round(gst.score * 100) + "% yakin";
+      if (calon !== gst.categoryName) { calon = gst.categoryName; mulaCalon = now; }
+      const p = Math.min(1, (now - mulaCalon) / 1000); $("#tahan").style.width = Math.round(p * 100) + "%";
+      if (p >= 1 && (akhirTambah !== calon || now - masaAkhir > 2500)) { const a = $("#ayat"); a.textContent = (a.textContent + " " + w).trim(); akhirTambah = calon; masaAkhir = now; bip(990, 90, .08); mulaCalon = now + 600; }
+      status(pil, "Isyarat dikesan", "ok");
+    } else { calon = null; $("#tahan").style.width = "0%"; if (!r.landmarks || !r.landmarks[0]) { $("#isyarat").textContent = "--"; $("#yakin").textContent = ""; status(pil, "Tunjukkan tangan", ""); } }
+    $("#hud").innerHTML = `<span>${kiraFps()} FPS</span><span>Gesture Recognizer</span>`;
+  }
+  requestAnimationFrame(gelung);
+}
+</script>
+</body>
+</html>
