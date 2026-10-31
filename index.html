@@ -12,14 +12,19 @@
   p.sub{color:var(--muted);margin:0 0 12px;font-size:.9rem;text-align:center}
   .stage{position:relative;width:100%;max-width:720px;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3}
   video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .mirror{transform:scaleX(-1)}
   .bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
-  button{background:var(--card);color:var(--fg);border:1px solid #2a3350;border-radius:10px;padding:10px 16px;font-size:.95rem;cursor:pointer}
+  button{background:var(--card);color:var(--fg);border:1px solid #2a3350;border-radius:10px;padding:10px 16px;font-size:.95rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
   button.primary{background:var(--acc);color:#04202a;border:none;font-weight:600}
   button:disabled{opacity:.5}
   #status{color:var(--muted);font-size:.85rem;text-align:center;min-height:1.2em}
   #list{width:100%;max-width:720px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
   .tag{background:var(--card);border:1px solid #2a3350;border-radius:999px;padding:4px 10px;font-size:.85rem}
   footer{margin-top:auto;padding-top:16px;color:var(--muted);font-size:.75rem}
+  #preview{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;z-index:10}
+  #preview.show{display:flex}
+  #preview img{max-width:100%;max-height:70vh;border-radius:10px}
+  #preview p{color:var(--muted);font-size:.85rem;margin:0;text-align:center}
 </style>
 </head>
 <body>
@@ -27,7 +32,7 @@
   <p class="sub">Pengesanan objek masa nyata (COCO-SSD, 80 kelas) — semua diproses dalam peranti</p>
 
   <div class="stage">
-    <video id="video" playsinline muted></video>
+    <video id="video" playsinline muted autoplay></video>
     <canvas id="canvas"></canvas>
   </div>
 
@@ -40,60 +45,79 @@
   <div id="list"></div>
   <footer>C-TeCH · Politeknik Ungku Omar</footer>
 
+  <div id="preview">
+    <img id="shot" alt="Gambar yang ditangkap">
+    <p>Tekan lama pada gambar untuk simpan ke Photos</p>
+    <div class="bar">
+      <button id="share" class="primary">📤 Simpan / Kongsi</button>
+      <button id="close">✕ Tutup</button>
+    </div>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 <script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const statusEl = document.getElementById('status');
-const listEl = document.getElementById('list');
-const btnStart = document.getElementById('start');
-const btnFlip = document.getElementById('flip');
-const btnSnap = document.getElementById('snap');
+const $ = id => document.getElementById(id);
+const video = $('video'), canvas = $('canvas'), ctx = canvas.getContext('2d');
+const statusEl = $('status'), listEl = $('list');
+const btnStart = $('start'), btnFlip = $('flip'), btnSnap = $('snap');
 
-let model = null, stream = null, facing = 'environment', running = false, lastPreds = [];
+let model = null, stream = null, facing = 'environment';
+let running = false, switching = false, lastBlob = null;
 
 async function loadModel(){
   if (model) return model;
-  statusEl.textContent = 'Memuatkan model AI… (kali pertama mungkin 5–10 saat)';
+  statusEl.textContent = 'Memuatkan model AI… (kali pertama 5–10 saat)';
   model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
   return model;
 }
 
+function stopStream(){
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  video.srcObject = null;
+}
+
+async function getStream(mode){
+  // Try exact first (reliable on iPhone/Android), then fall back to ideal
+  try {
+    return await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: mode } }, audio: false });
+  } catch (e) {
+    return await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: false });
+  }
+}
+
 async function startCamera(){
-  if (stream) stream.getTracks().forEach(t => t.stop());
-  stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
-    audio: false
-  });
+  stopStream();
+  stream = await getStream(facing);
   video.srcObject = stream;
+  await new Promise(r => { video.onloadedmetadata = r; if (video.readyState >= 1) r(); });
   await video.play();
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  video.style.transform = canvas.style.transform = facing === 'user' ? 'scaleX(-1)' : 'none';
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const m = facing === 'user';
+  video.classList.toggle('mirror', m);
+  canvas.classList.toggle('mirror', m);
 }
 
 function draw(preds){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const lw = Math.max(2, canvas.width / 320);
-  ctx.lineWidth = lw;
-  ctx.font = `${Math.round(canvas.width / 40)}px system-ui, sans-serif`;
+  const fs = Math.max(14, Math.round(canvas.width / 40));
+  ctx.lineWidth = Math.max(2, canvas.width / 320);
+  ctx.font = `${fs}px system-ui, sans-serif`;
+  const mirrored = facing === 'user';
   preds.forEach(p => {
     const [x, y, w, h] = p.bbox;
     ctx.strokeStyle = '#22d3ee';
     ctx.strokeRect(x, y, w, h);
     const label = `${p.class} ${(p.score * 100).toFixed(0)}%`;
-    const tw = ctx.measureText(label).width + 12;
-    const th = parseInt(ctx.font) + 8;
+    const tw = ctx.measureText(label).width + 12, th = fs + 8;
+    const ty = Math.max(0, y - th);
     ctx.fillStyle = '#22d3ee';
-    ctx.fillRect(x, Math.max(0, y - th), tw, th);
+    ctx.fillRect(x, ty, tw, th);
     ctx.fillStyle = '#04202a';
     ctx.save();
-    if (facing === 'user') { /* keep text readable when mirrored */
-      ctx.translate(x + tw / 2, 0); ctx.scale(-1, 1); ctx.translate(-(x + tw / 2), 0);
-    }
-    ctx.fillText(label, x + 6, Math.max(th - 8, y - 8));
+    if (mirrored) { ctx.translate(x + tw / 2, 0); ctx.scale(-1, 1); ctx.translate(-(x + tw / 2), 0); }
+    ctx.fillText(label, x + 6, ty + fs);
     ctx.restore();
   });
 }
@@ -104,19 +128,21 @@ function updateList(preds){
   listEl.innerHTML = '';
   Object.entries(counts).forEach(([k, v]) => {
     const s = document.createElement('span');
-    s.className = 'tag';
-    s.textContent = `${k} × ${v}`;
+    s.className = 'tag'; s.textContent = `${k} × ${v}`;
     listEl.appendChild(s);
   });
 }
 
 async function loop(){
   if (!running) return;
-  if (video.readyState >= 2) {
-    lastPreds = await model.detect(video, 20, 0.5);
-    draw(lastPreds);
-    updateList(lastPreds);
-    statusEl.textContent = lastPreds.length ? `${lastPreds.length} objek dikesan` : 'Tiada objek dikesan';
+  if (!switching && video.readyState >= 2 && video.videoWidth) {
+    try {
+      const preds = await model.detect(video, 20, 0.5);
+      if (!switching) {
+        draw(preds); updateList(preds);
+        statusEl.textContent = preds.length ? `${preds.length} objek dikesan` : 'Tiada objek dikesan';
+      }
+    } catch (e) { /* skip this frame */ }
   }
   requestAnimationFrame(loop);
 }
@@ -132,13 +158,25 @@ btnStart.onclick = async () => {
     loop();
   } catch (e) {
     btnStart.disabled = false;
-    statusEl.textContent = 'Gagal akses kamera: ' + e.message + ' — pastikan laman dibuka melalui https dan kebenaran kamera diberi.';
+    statusEl.textContent = 'Gagal akses kamera: ' + e.message;
   }
 };
 
 btnFlip.onclick = async () => {
+  if (switching) return;
+  switching = true; btnFlip.disabled = true;
+  const prev = facing;
   facing = facing === 'environment' ? 'user' : 'environment';
-  try { await startCamera(); } catch (e) { statusEl.textContent = 'Tak dapat tukar kamera: ' + e.message; }
+  statusEl.textContent = 'Menukar kamera…';
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  try {
+    await startCamera();
+  } catch (e) {
+    facing = prev;
+    statusEl.textContent = 'Peranti ini tiada kamera kedua, atau tak dapat ditukar.';
+    try { await startCamera(); } catch (_) {}
+  }
+  switching = false; btnFlip.disabled = false;
 };
 
 btnSnap.onclick = () => {
@@ -146,13 +184,27 @@ btnSnap.onclick = () => {
   out.width = canvas.width; out.height = canvas.height;
   const o = out.getContext('2d');
   if (facing === 'user') { o.translate(out.width, 0); o.scale(-1, 1); }
-  o.drawImage(video, 0, 0);
+  o.drawImage(video, 0, 0, out.width, out.height);
   o.drawImage(canvas, 0, 0);
-  const a = document.createElement('a');
-  a.download = 'ai-vision-' + Date.now() + '.png';
-  a.href = out.toDataURL('image/png');
-  a.click();
+  $('shot').src = out.toDataURL('image/jpeg', 0.92);
+  out.toBlob(b => { lastBlob = b; }, 'image/jpeg', 0.92);
+  $('preview').classList.add('show');
 };
+
+$('share').onclick = async () => {
+  if (!lastBlob) return;
+  const file = new File([lastBlob], 'ai-vision-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: 'AI Vision Demo' }); } catch (e) {}
+  } else {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(lastBlob);
+    a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+};
+
+$('close').onclick = () => $('preview').classList.remove('show');
 </script>
 </body>
 </html>
