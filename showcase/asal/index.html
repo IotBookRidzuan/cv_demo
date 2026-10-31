@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Versi Asal · AI Vision Showcase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../common.css?v=3">
+<style>
+.kepala{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:20px;align-items:center;padding-block:10px 18px}
+.kepala svg{width:100%;height:auto;overflow:visible}
+@media (max-width:700px){.kepala{grid-template-columns:1fr}.kepala .ik{max-width:140px}}
+.skrin{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:radial-gradient(70% 70% at 50% 40%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),#05070d;box-shadow:0 0 0 1px var(--line)}
+.skrin iframe,.skrin video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.skrin .kosong2{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:10px;text-align:center;padding:20px;color:var(--muted)}
+.skrin .kosong2 b{font:700 20px/1.2 var(--display);color:var(--fg)}
+.navp{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tek{display:flex;flex-wrap:wrap;gap:6px}
+.tek span{padding:6px 10px;border-radius:99px;background:var(--panel2);font:600 12px/1 var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="atas"><a class="balik" href="../">← Semua projek</a><div class="tajuk"><small id="kecil">Versi asal</small><h1 id="tajuk">AI Vision Showcase</h1></div><span class="pil" id="pil"><i></i>Versi asal</span></header>
+  <div class="grid">
+    <div>
+      <div class="skrin" id="skrin"></div>
+      <div class="navp" id="navp"></div>
+    </div>
+    <aside class="panel">
+      <section class="kad"><div class="kepala" style="grid-template-columns:1fr"><div class="ik" id="ikon" style="max-width:150px"></div></div><p id="ringkas" style="margin:0;color:#CDD3E6"></p></section>
+      <section class="kad"><h2>Teknologi asal</h2><div class="tek" id="tek"></div><p class="privasi" id="nota" style="margin:10px 0 0"></p></section>
+      <section class="kad"><h2>Tentang versi ini</h2><p class="privasi" style="margin:0">Versi asal ialah aplikasi penuh yang dibina oleh pasukan pelajar, termasuk antara muka dan model AI mereka sendiri. Kebanyakannya aplikasi Python yang dijalankan pada komputer atau Raspberry Pi, jadi ia dipaparkan di sini melalui video demo. Untuk mencuba terus dengan kamera, guna <b>⚡ Live ringan</b>.</p></section>
+    </aside>
+  </div>
+</div>
+<script src="data.js?v=1"></script>
+<script>
+const $ = s => document.querySelector(s);
+const KAT = {
+  kampus: { n: "Kampus & Pendidikan", c: "var(--ai)", h: "rgba(90,169,255,.30)" },
+  selamat: { n: "Keselamatan", c: "var(--rose)", h: "rgba(255,122,138,.26)" },
+  sihat: { n: "Kesihatan", c: "var(--bio)", h: "rgba(69,211,166,.28)" },
+  industri: { n: "Industri & Pertanian", c: "var(--ese)", h: "rgba(244,162,76,.28)" },
+  inklusif: { n: "Inklusif", c: "var(--violet)", h: "rgba(181,156,255,.28)" },
+  bencana: { n: "Alam & Bencana", c: "var(--gold)", h: "rgba(242,193,78,.26)" }
+};
+// 15 projek — ringkasan ialah draf; boleh dikemas kini oleh pemilik dalam halaman ini
+const PROJEK = [
+  ["AI Face Recognition Attendance", "Attendance", "kampus", "Merekod kehadiran pelajar secara automatik melalui pengecaman wajah dengan kamera, tanpa kad atau tandatangan."],
+  ["PolyGate Vision", "Campus traffic", "kampus", "Memantau kenderaan di pintu masuk kampus, mengecam plat nombor dan mencatat trafik keluar masuk."],
+  ["S.A.F.E Anti-bullying Engine", "Student safety", "selamat", "Mengesan tingkah laku agresif atau buli dalam rakaman kamera dan memberi amaran awal kepada pihak kampus."],
+  ["GloveVision Defect Detection", "Quality control", "industri", "Memeriksa sarung tangan di barisan pengeluaran dan mengesan kecacatan seperti koyak atau lubang secara automatik."],
+  ["Nail Capillary Illness Detection", "Health", "sihat", "Menganalisis imej kapilari lipatan kuku untuk membantu saringan awal tanda-tanda penyakit."],
+  ["Flood Monitoring System", "Disaster", "bencana", "Memantau paras air melalui kamera dan memberi amaran awal sebelum banjir berlaku."],
+  ["AI PPE Compliance Detection", "Workplace safety", "selamat", "Memastikan pekerja memakai topi keselamatan, jaket dan peralatan pelindung diri yang betul di tempat kerja."],
+  ["Road Damage Detection", "Road infrastructure", "industri", "Mengesan lubang dan retakan jalan raya daripada video kenderaan untuk membantu kerja penyelenggaraan."],
+  ["Smart Cattle Monitoring", "Smart farming", "industri", "Memantau lembu di ladang, termasuk kiraan dan pergerakan, menggunakan kamera dan AI."],
+  ["AI Theft Detection & Alert", "Security", "selamat", "Mengesan aktiviti mencurigakan dalam rakaman CCTV dan menghantar amaran segera."],
+  ["AI Smart Sign Language", "Inclusion", "inklusif", "Menterjemah bahasa isyarat kepada teks secara masa nyata untuk memudahkan komunikasi."],
+  ["Driver Fatigue Detection (ADAS)", "Road safety", "selamat", "Mengesan tanda keletihan pemandu seperti mata tertutup dan menguap, lalu memberi amaran."],
+  ["VisionAvatar Interpreter", "Inclusive service", "inklusif", "Avatar digital yang membantu komunikasi di kaunter perkhidmatan supaya lebih inklusif."],
+  ["Fruit Ripeness Grading", "Agritech", "industri", "Menggred tahap kematangan buah berdasarkan warna dan tekstur untuk sektor pertanian."],
+  ["Posture & Health Monitoring", "Health", "sihat", "Menganalisis postur badan semasa duduk atau bekerja dan memberi maklum balas kesihatan."]
+].map((p, i) => ({ i, id: "p" + String(i + 1).padStart(2, "0"), no: String(i + 1).padStart(2, "0"), tajuk: p[0], sub: p[1], kat: p[2], asal: p[3] }));
+
+// ikon hologram setiap projek (garisan dalam grid -50..50, y ke atas)
+const PI = Math.PI, BL = (cx, cy, r, a0, a1, n) => { const o = []; n = n || 18; for (let i = 0; i <= n; i++) { const t = a0 + (a1 - a0) * i / n; o.push([cx + Math.cos(t) * r, cy + Math.sin(t) * r]); } return o; };
+const IKON = [
+  () => [BL(0, 2, 26, 0, 2 * PI, 24), BL(-9, 9, 3, 0, 2 * PI, 8), BL(9, 9, 3, 0, 2 * PI, 8), BL(0, -2, 11, -PI * .85, -PI * .15, 8), [[-42, 26], [-42, 42], [-26, 42]], [[26, 42], [42, 42], [42, 26]], [[-42, -26], [-42, -42], [-26, -42]], [[26, -42], [42, -42], [42, -26]]],
+  () => [[[-38, -38], [-38, 20]], [[-38, 12], [40, 22]], [[-20, 14.5], [-16, 15]], [[0, 17], [4, 17.5]], [[20, 19.5], [24, 20]], [[-8, -38], [-8, -22], [0, -12], [30, -12], [38, -22], [38, -38], [-8, -38]], BL(4, -38, 6, 0, 2 * PI, 10), BL(28, -38, 6, 0, 2 * PI, 10)],
+  () => [[[0, 40], [30, 30], [28, -4], [0, -40], [-28, -4], [-30, 30], [0, 40]], [[-12, 2], [-3, -8], [14, 14]]],
+  () => [[[-22, -38], [-22, 6], [-30, 18], [-26, 22], [-16, 12]], [[-22, -38], [20, -38], [20, 8]], [[-14, 6], [-14, 36]], [[-2, 8], [-2, 40]], [[10, 8], [10, 36]], [[20, 8], [20, 28]], [[-4, -18], [8, -6]], [[8, -18], [-4, -6]]],
+  () => [[[-24, -40], [-24, 14], ...BL(0, 14, 24, PI, 0, 14).slice(1), [24, -40]], [[-12, 8], [-12, 24], ...BL(0, 24, 12, PI, 0, 10).slice(1), [12, 8], [-12, 8]], BL(22, -14, 18, 0, 2 * PI, 22), [[34, -27], [44, -38]], [[10, -14], [14, -10], [18, -18], [22, -10], [26, -18], [30, -14]]],
+  () => [[[-40, -10], ...Array.from({ length: 16 }, (_, i) => [-40 + i * 5.33, -10 + Math.sin(i * .9) * 5])], [[-40, -24], ...Array.from({ length: 16 }, (_, i) => [-40 + i * 5.33, -24 + Math.sin(i * .9 + 1) * 5])], [[22, -38], [22, 40]], [[22, 30], [30, 30]], [[22, 18], [28, 18]], [[22, 6], [30, 6]], [[-30, 4], [-30, 26], [-16, 38], [-2, 26], [-2, 4], [-30, 4]]],
+  () => [[[-40, -6], [40, -6]], [[-30, -6], ...BL(0, -6, 30, PI, 0, 18).slice(1)], [[0, 24], [0, -6]], [[-14, 20], [-10, -6]], [[14, 20], [10, -6]], [[-30, -14], [30, -14]]],
+  () => [[[-40, -40], [-12, 40]], [[40, -40], [12, 40]], [[0, -40], [0, -28]], [[0, -16], [0, -4]], [[0, 8], [0, 20]], [[-14, -10], [-6, -2], [-12, 6], [-2, 14], [-8, 22]]],
+  () => [[[-16, 22], [16, 22], [12, -24], [-12, -24], [-16, 22]], BL(0, -28, 12, 0, 2 * PI, 14), [[-16, 18], [-36, 30], [-38, 38]], [[16, 18], [36, 30], [38, 38]], [[-16, 10], [-30, 8], [-24, 2], [-16, 4]], [[16, 10], [30, 8], [24, 2], [16, 4]], [[18, -2], [26, -2], [26, -12], [18, -12], [18, -2]]],
+  () => [[[-36, 20], [12, 30], [18, 10], [-30, 0], [-36, 20]], [[-8, 4], [-14, -18], [-28, -22]], BL(-26, 22, 3, 0, 2 * PI, 8), [[16, -40], [40, -40], [28, -18], [16, -40]], [[28, -34], [28, -27]], [[28, -24], [28, -23]]],
+  () => [[[-20, -40], [-20, 0], [-30, 16]], [[-20, -40], [16, -40], [20, -10]], [[-14, -2], [-16, 34]], [[-4, -2], [-4, 42]], [[6, -2], [8, 38]], [[16, -6], [20, 26]], [[-26, 30], [-30, 34]], [[24, 34], [30, 40]]],
+  () => [[...BL(-6, -28, 34, PI * .25, PI * .75, 12)], [...BL(-6, 52, 34, -PI * .75, -PI * .25, 12)], [[-30, 12], [18, 12]], [[-28, 18], [-30, 26]], [[-6, 18], [-6, 28]], [[16, 18], [18, 26]], BL(14, -24, 16, 0, 2 * PI, 22), [[0, -24], [28, -24]], [[14, -24], [14, -40]]],
+  () => [BL(-12, 14, 14, 0, 2 * PI, 18), [...BL(-12, -24, 24, PI * .1, PI * .9, 12)], [[8, 40], [42, 40], [42, 16], [20, 16], [12, 6], [14, 16], [8, 16], [8, 40]], [[16, 32], [34, 32]], [[16, 24], [28, 24]]],
+  () => [BL(0, -6, 28, 0, 2 * PI, 26), [[0, 22], [2, 36]], [[2, 32], [16, 40], [24, 34], [10, 30], [2, 32]], [[-30, -40], [-16, -40]], [[-8, -40], [6, -40]], [[14, -40], [28, -40]]],
+  () => [BL(-10, 30, 8, 0, 2 * PI, 12), [[-10, 22], [-10, -8]], [[-10, 14], [-26, 2]], [[-10, 14], [6, 2]], [[-10, -8], [-22, -36]], [[-10, -8], [2, -36]], [[10, -14], [18, -14], [22, -4], [26, -24], [30, -14], [42, -14]]]
+];
+const warna = p => KAT[p.kat].c;
+function seni(p, kelas) {   // SVG: lapisan belakang (kedalaman) + depan bercahaya + bingkai imbasan
+  const L = IKON[p.i](), d = pts => "M" + pts.map(q => q[0].toFixed(1) + " " + (-q[1]).toFixed(1)).join("L");
+  const jalur = L.map(d).join(" "), c = warna(p), uid = "g" + p.id + (kelas || "");
+  return `<svg class="${kelas || ""}" viewBox="-60 -60 120 120" aria-hidden="true"><defs><filter id="${uid}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <rect x="-54" y="-54" width="108" height="108" rx="10" fill="none" stroke="${c}" stroke-opacity=".22" stroke-width=".8" stroke-dasharray="3 4"/>
+    <path d="${jalur}" transform="translate(5 4)" fill="none" stroke="${c}" stroke-opacity=".28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${jalur}" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#${uid})"/>
+    <line x1="-54" x2="54" y1="-30" y2="-30" stroke="#fff" stroke-opacity=".5" stroke-width=".6"><animate attributeName="y1" values="-50;50;-50" dur="5s" repeatCount="indefinite"/><animate attributeName="y2" values="-50;50;-50" dur="5s" repeatCount="indefinite"/></line></svg>`;
+}
+
+
+
+const LIVE = { p09: 1, p10: 1, p11: 1, p12: 1, p15: 1 };
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function embed(u) {
+  if (!u) return "";
+  let m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([\w-]{6,})/); if (m) return `<iframe src="https://www.youtube.com/embed/${m[1]}?rel=0" title="Video demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]{10,})/); if (m) return `<iframe src="https://drive.google.com/file/d/${m[1]}/preview" title="Video demo" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  if (/\.(mp4|webm)(\?|$)/i.test(u)) return `<video controls playsinline src="${esc(u)}"></video>`;
+  return "";
+}
+function papar() {
+  const id = (location.hash || "#p01").slice(1), p = PROJEK.find(x => x.id === id) || PROJEK[0], d = (window.ASAL || {})[p.id] || {};
+  document.documentElement.style.setProperty("--c", warna(p));
+  document.title = `P${p.no} ${p.tajuk} · Versi asal`;
+  $("#kecil").textContent = `Projek ${p.no} · ${KAT[p.kat].n} · Versi asal`; $("#tajuk").textContent = p.tajuk;
+  $("#ikon").innerHTML = seni(p); $("#ringkas").textContent = d.ringkas || p.asal;
+  $("#tek").innerHTML = (d.tek || ["Python", "Computer Vision"]).map(t => `<span>${esc(t)}</span>`).join("");
+  $("#nota").textContent = d.nota || "";
+  const e = embed(d.video);
+  $("#skrin").innerHTML = e || `<div class="kosong2">${seni(p).replace("<svg ", '<svg style="width:120px;height:120px" ')}<b>Video demo versi asal akan datang</b><span>Pasukan projek sedang merakam demo aplikasi penuh mereka.</span></div>`;
+  status($("#pil"), e ? "Video demo" : "Menunggu video", e ? "ok" : "");
+  $("#navp").innerHTML = (LIVE[p.id] ? `<a class="btn utama" href="../${p.id}/">⚡ Cuba Live ringan</a>` : "") + (d.app ? `<a class="btn" href="${esc(d.app)}" target="_blank" rel="noopener">🌐 Buka aplikasi asal ↗</a>` : "") +
+    `<a class="btn" href="#${PROJEK[(p.i + 14) % 15].id}">← Sebelum</a><a class="btn" href="#${PROJEK[(p.i + 1) % 15].id}">Seterusnya →</a>`;
+  scrollTo(0, 0);
+}
+function status(el, t, j) { el.className = "pil" + (j ? " " + j : ""); el.innerHTML = "<i></i>" + t; }
+addEventListener("hashchange", papar); papar();
+</script>
+</body>
+</html>

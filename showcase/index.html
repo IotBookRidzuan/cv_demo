@@ -17,7 +17,7 @@
 .tapis button.on{background:rgba(255,255,255,.08);color:var(--fg)}
 .senarai{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .k{position:relative;display:grid;text-decoration:none;background:var(--panel);border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line);transition:transform .25s cubic-bezier(.2,.9,.25,1),box-shadow .25s}
-a.k:hover,a.k:focus-visible{transform:translateY(-4px) scale(1.02);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent),0 18px 40px -12px color-mix(in srgb,var(--c) 45%,transparent)}
+.k:hover,.k:focus-within{transform:translateY(-4px) scale(1.02);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent),0 18px 40px -12px color-mix(in srgb,var(--c) 45%,transparent)}
 .k .seni{position:relative;aspect-ratio:16/10;background:radial-gradient(120% 90% at 70% 30%,color-mix(in srgb,var(--c) 26%,transparent),transparent 65%),linear-gradient(160deg,#0f1628,#080b14)}
 .k .seni svg{position:absolute;inset:8% 22%;width:56%;height:84%;overflow:visible}
 .k .no{position:absolute;left:12px;top:10px;font:700 13px/1 var(--mono);letter-spacing:.1em;color:color-mix(in srgb,var(--c) 85%,white)}
@@ -27,7 +27,12 @@ a.k:hover,a.k:focus-visible{transform:translateY(-4px) scale(1.02);box-shadow:0 
 .k .isi{display:grid;gap:6px;padding:12px 14px 14px}
 .k .isi b{font:600 15px/1.25 var(--display)}
 .k .isi span{font:500 12px/1.3 var(--body);color:var(--muted)}
-div.k{opacity:.62}
+.k .dua{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px 12px}
+.k .dua a,.k .dua span{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 8px;border-radius:9px;font:700 12px/1.1 var(--body);text-decoration:none;text-align:center}
+.k .dua .ringan{background:var(--c);color:#04101a}
+.k .dua .asal{background:rgba(255,255,255,.08);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.k .dua .asal:hover{background:rgba(255,255,255,.14)}
+.k .dua span{background:rgba(255,255,255,.04);color:var(--dim)}
 footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
 </style>
 </head>
@@ -36,7 +41,7 @@ footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:v
   <section class="hero">
     <small>C-TeCH · Politeknik Ungku Omar</small>
     <h1>AI Vision <span>Showcase</span> · Live</h1>
-    <p>15 projek Computer Vision oleh pelajar WBL. Pilih projek bertanda LIVE dan cuba terus dengan kamera telefon atau laptop anda. Semua video diproses dalam peranti, tiada imej dihantar keluar.</p>
+    <p>15 projek Computer Vision oleh pelajar WBL. Setiap projek ada dua versi: <b>⚡ Live ringan</b> untuk dicuba terus dengan kamera telefon atau laptop, dan <b>🎬 Versi asal</b> iaitu aplikasi penuh yang dibina pelajar. Semua video diproses dalam peranti, tiada imej dihantar keluar.</p>
   </section>
   <nav class="tapis" id="tapis" aria-label="Tapis"></nav>
   <main class="senarai" id="senarai"></main>
@@ -109,7 +114,7 @@ function lukis() {
   $("#tapis").innerHTML = [["semua", "Semua"], ["live", "LIVE sahaja"], ...Object.keys(KAT).map(k => [k, KAT[k].n])].map(([k, n]) => `<button type="button" data-t="${k}" class="${tapis === k ? "on" : ""}">${n}</button>`).join("");
   $("#senarai").innerHTML = PROJEK.filter(p => tapis === "semua" || (tapis === "live" ? LIVE[p.id] : p.kat === tapis)).map(p => {
     const live = LIVE[p.id], inti = `<div class="seni">${seni(p)}<span class="no">${p.no}</span><span class="lencana ${live ? "live" : "datang"}">${live ? "● LIVE" : "AKAN DATANG"}</span></div><div class="isi"><b>${esc(p.tajuk)}</b><span>${KAT[p.kat].n} · ${esc(p.asal)}</span></div>`;
-    return live ? `<a class="k" href="${p.id}/" style="--c:${warna(p)}">${inti}</a>` : `<div class="k" style="--c:${warna(p)}" aria-disabled="true">${inti}</div>`; }).join("");
+    return `<div class="k" style="--c:${warna(p)}">${inti}<div class="dua">${live ? `<a class="ringan" href="${p.id}/">⚡ Live ringan</a>` : `<span>⚡ Akan datang</span>`}<a class="asal" href="asal/#${p.id}">🎬 Versi asal</a></div></div>`; }).join("");
 }
 $("#tapis").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) { tapis = b.dataset.t; lukis(); } });
 lukis();
