@@ -10,6 +10,7 @@
   --mono:'Geist Mono',ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--fg)}
 body{font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh;padding:env(safe-area-inset-top,0px) max(14px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 24px) max(14px,env(safe-area-inset-left,0px))}
 a{color:inherit}
