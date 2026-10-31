@@ -1,3 +1,4 @@
+window.__modOK = true;
 // AI Vision Showcase · pembantu kamera dikongsi (ES module)
 export const $ = s => document.querySelector(s);
 export const masa = () => new Date().toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -11,7 +12,7 @@ export function kamera({ video, pentas, onReady, onStatus }) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: hadap, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
     } catch (e) {
-      onStatus && onStatus(e && e.name === "NotAllowedError" ? "Akses kamera ditolak. Benarkan kamera pada ikon kunci di bar alamat, kemudian cuba lagi." : "Kamera tidak dapat dibuka: " + (e && e.message || e));
+      const msg = (e && e.name === "NotAllowedError" ? "Akses kamera ditolak. Benarkan kamera pada ikon kunci di bar alamat, kemudian cuba lagi." : "Kamera tidak dapat dibuka: " + (e && (e.name + " – " + e.message) || e)); onStatus && onStatus(msg); const t = document.querySelector("#tunggu p"); if (t) t.textContent = msg;
       return false;
     }
     video.srcObject = stream; video.muted = true; video.playsInline = true; await video.play().catch(() => {});

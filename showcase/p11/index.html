@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>P11 Smart Sign Language · AI Vision Showcase</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="../common.css">
+<link rel="stylesheet" href="../common.css?v=3">
 <style>
 :root{--c:var(--violet)}
 .ayat{min-height:64px;padding:14px;border-radius:12px;background:var(--panel2);font:600 22px/1.35 var(--display)}
@@ -47,7 +47,7 @@
   </div>
 </div>
 <script type="module">
-import { $, kamera, padanKanvas, bip, cakap, status, fps, mediapipe } from "../common.js";
+import { $, kamera, padanKanvas, bip, cakap, status, fps, mediapipe } from "../common.js?v=3";
 const PETA = { Open_Palm: ["✋", "Hai"], Thumb_Up: ["👍", "Ya"], Thumb_Down: ["👎", "Tidak"], Victory: ["✌️", "Terima kasih"], Closed_Fist: ["✊", "Tunggu"], Pointing_Up: ["☝️", "Saya"], ILoveYou: ["🤟", "Sayang"] };
 $("#peta").innerHTML = Object.values(PETA).map(([e, w]) => `<div><b>${e}</b><span>${w}</span></div>`).join("");
 const video = $("#video"), kanvas = $("#kanvas"), g = kanvas.getContext("2d"), pil = $("#pil"), kiraFps = fps();
@@ -83,6 +83,19 @@ function gelung() {
   }
   requestAnimationFrame(gelung);
 }
+</script>
+<script>
+/* sandaran: jika modul JavaScript gagal dimuat, kamera tetap boleh dibuka & punca dipaparkan */
+setTimeout(function () {
+  if (window.__modOK) return;
+  var pil = document.getElementById("pil"); if (pil) { pil.className = "pil bahaya"; pil.innerHTML = "<i></i>Skrip demo gagal dimuat. Muat semula halaman (tarik ke bawah)."; }
+  var b = document.getElementById("mula"); if (!b) return;
+  b.onclick = function () {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }).then(function (s) {
+      var v = document.getElementById("video"); v.srcObject = s; v.play(); document.getElementById("tunggu").style.display = "none";
+    }).catch(function (e) { if (pil) pil.innerHTML = "<i></i>Kamera: " + e.name + " – " + e.message; });
+  };
+}, 4000);
 </script>
 </body>
 </html>
