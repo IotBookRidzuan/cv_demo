@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Buku Ikut Mood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f1a14; --muted:#6f6556; --line:#e3d9c6;
+    --acc:#b4532a; --acc2:#2f5d50; --gold:#c99a2e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
+  header{width:100%;max-width:760px;text-align:center;margin:6px 0 14px}
+  .lib{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:Fraunces,Georgia,serif;font-size:clamp(1.7rem,6vw,2.6rem);margin:6px 0 4px;line-height:1.1}
+  h1 em{color:var(--acc);font-style:normal}
+  .sub{color:var(--muted);margin:0;font-size:.95rem}
+
+  .stage{position:relative;width:100%;max-width:760px;aspect-ratio:4/3;background:#1b1611;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(60,40,20,.15)}
+  video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:#fff;padding:20px;background:radial-gradient(ellipse at center,rgba(27,22,17,.35),rgba(27,22,17,.85))}
+  .overlay.hide{display:none}
+  .big{font-family:Fraunces,serif;font-size:clamp(1.3rem,5vw,2rem)}
+  .count{font-family:Fraunces,serif;font-size:clamp(4rem,18vw,7rem);line-height:1;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.5)}
+  .hint{position:absolute;left:0;right:0;bottom:12px;text-align:center;color:#fff;font-size:.95rem;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+
+  button{font:inherit;border:none;border-radius:999px;padding:14px 26px;font-weight:600;font-size:1rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .primary{background:var(--acc);color:#fff}
+  .ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .privacy{font-size:.78rem;color:var(--muted);text-align:center;max-width:760px;margin:12px 0 0}
+
+  #result{width:100%;max-width:760px;margin-top:18px;display:none}
+  #result.show{display:block;animation:up .5s ease}
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .mood{display:flex;align-items:center;gap:14px}
+  .emoji{font-size:3rem;line-height:1}
+  .mood h2{font-family:Fraunces,serif;margin:0;font-size:1.5rem}
+  .mood p{margin:2px 0 0;color:var(--muted);font-size:.92rem}
+  .meters{display:grid;gap:10px;margin:18px 0 6px}
+  .meter{display:grid;grid-template-columns:110px 1fr 44px;align-items:center;gap:10px;font-size:.88rem}
+  .track{height:10px;background:#efe6d4;border-radius:99px;overflow:hidden}
+  .fill{height:100%;border-radius:99px;width:0;transition:width 1s ease}
+  .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .note{font-size:.75rem;color:var(--muted);margin:4px 0 0}
+
+  h3{font-family:Fraunces,serif;font-size:1.25rem;margin:22px 0 10px}
+  .books{display:grid;gap:12px}
+  .book{display:grid;grid-template-columns:54px 1fr;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .spine{border-radius:4px 8px 8px 4px;height:76px;position:relative;box-shadow:inset 6px 0 0 rgba(0,0,0,.12)}
+  .spine::after{content:"";position:absolute;left:12px;right:8px;top:14px;height:2px;background:rgba(255,255,255,.55);box-shadow:0 8px 0 rgba(255,255,255,.35)}
+  .book b{display:block;font-size:1rem}
+  .book .by{color:var(--muted);font-size:.85rem}
+  .book .why{font-size:.9rem;margin-top:6px}
+  .tag{display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--acc2);background:#e4efe9;border-radius:99px;padding:2px 8px;margin-top:6px}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 6px}
+  .timer{text-align:center;font-size:.8rem;color:var(--muted)}
+  footer{margin-top:auto;padding-top:22px;font-size:.75rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+  <header>
+    <div class="lib">Perpustakaan Tan Sri Othman Merican · PUO</div>
+    <h1>Tak tahu nak baca <em>apa?</em></h1>
+    <p class="sub">Senyum ke kamera — AI baca mood anda dan pilihkan buku yang sesuai.</p>
+  </header>
+
+  <div class="stage">
+    <video id="video" playsinline muted autoplay></video>
+    <canvas id="canvas"></canvas>
+    <div class="hint" id="hint"></div>
+
+    <div class="overlay" id="ovStart">
+      <div class="big">📚 Jom cari buku untuk mood anda</div>
+      <button class="primary" id="btnStart">Mula Imbas</button>
+    </div>
+    <div class="overlay hide" id="ovLoad"><div class="big" id="loadMsg">Menyediakan AI…</div></div>
+    <div class="overlay hide" id="ovCount" style="background:transparent">
+      <div class="count" id="countNum">3</div>
+    </div>
+  </div>
+
+  <p class="privacy">🔒 Wajah anda diproses dalam peranti ini sahaja — tiada gambar disimpan atau dihantar ke mana-mana.</p>
+
+  <section id="result">
+    <div class="card">
+      <div class="mood">
+        <div class="emoji" id="rEmoji">🙂</div>
+        <div><h2 id="rTitle">—</h2><p id="rDesc"></p></div>
+      </div>
+      <div class="meters">
+        <div class="meter"><span>😊 Tahap gembira</span><div class="track"><div class="fill" id="mHappy" style="background:var(--gold)"></div></div><span class="num" id="nHappy">0%</span></div>
+        <div class="meter"><span>😌 Tahap tenang</span><div class="track"><div class="fill" id="mCalm" style="background:var(--acc2)"></div></div><span class="num" id="nCalm">0%</span></div>
+        <div class="meter"><span>😣 Tahap tekanan</span><div class="track"><div class="fill" id="mStress" style="background:var(--acc)"></div></div><span class="num" id="nStress">0%</span></div>
+      </div>
+      <p class="note">*Anggaran daripada riak wajah untuk tujuan hiburan — bukan penilaian psikologi.</p>
+    </div>
+
+    <h3>Cadangan buku untuk anda</h3>
+    <div class="books" id="books"></div>
+    <p class="note" style="text-align:center;margin-top:10px">Semak ketersediaan di katalog perpustakaan atau tanya di kaunter.</p>
+
+    <div class="actions">
+      <button class="primary" id="btnAgain">Imbas Semula</button>
+      <button class="ghost" id="btnDone">Selesai</button>
+    </div>
+    <div class="timer" id="timer"></div>
+  </section>
+
+  <footer>C-TeCH · Politeknik Ungku Omar</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js"></script>
+<script>
+const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model/';
+const $ = id => document.getElementById(id);
+const video = $('video'), canvas = $('canvas'), ctx = canvas.getContext('2d');
+
+const MOODS = {
+  happy: {
+    emoji:'😄', title:'Ceria & bertenaga',
+    desc:'Mood anda positif! Masa yang sesuai untuk buku yang memberi inspirasi dan mengembangkan impian.',
+    books:[
+      {t:'Ikigai', a:'Héctor García & Francesc Miralles', g:'Motivasi', w:'Kekalkan semangat — temui tujuan hidup yang membuat anda bangun setiap pagi.'},
+      {t:'The Alchemist', a:'Paulo Coelho', g:'Fiksyen', w:'Kisah mengejar impian, sesuai untuk jiwa yang sedang optimis.'},
+      {t:'Laskar Pelangi', a:'Andrea Hirata', g:'Novel', w:'Cerita persahabatan dan semangat belajar yang menghangatkan hati.'}
+    ]
+  },
+  sad: {
+    emoji:'🥺', title:'Sedikit muram',
+    desc:'Nampak macam ada yang terbuku di hati. Buku-buku ini lembut dan memberi harapan.',
+    books:[
+      {t:'Tuesdays with Morrie', a:'Mitch Albom', g:'Memoir', w:'Pelajaran hidup yang menenangkan daripada seorang guru kepada anak muridnya.'},
+      {t:'Hujan', a:'Tere Liye', g:'Novel', w:'Tentang kehilangan, melepaskan dan bangkit semula.'},
+      {t:"Man's Search for Meaning", a:'Viktor E. Frankl', g:'Psikologi', w:'Bagaimana mencari makna walaupun dalam saat paling sukar.'}
+    ]
+  },
+  stress: {
+    emoji:'😤', title:'Sedang tertekan',
+    desc:'Wajah anda nampak tegang. Mungkin masa untuk berehat sebentar dengan bacaan yang menenangkan.',
+    books:[
+      {t:'La Tahzan', a:"Dr. 'Aidh al-Qarni", g:'Motivasi', w:'Jangan bersedih — peringatan lembut untuk melapangkan dada.'},
+      {t:"Don't Sweat the Small Stuff", a:'Richard Carlson', g:'Pengurusan stres', w:'Tip ringkas untuk berhenti risau tentang perkara kecil.'},
+      {t:'The Power of Now', a:'Eckhart Tolle', g:'Kesedaran diri', w:'Belajar hidup pada saat ini dan kurangkan fikiran berlebihan.'}
+    ]
+  },
+  anxious: {
+    emoji:'😟', title:'Sedikit cemas',
+    desc:'Ada sedikit kebimbangan pada riak wajah anda. Buku ini membina keyakinan diri.',
+    books:[
+      {t:'Mindset', a:'Carol S. Dweck', g:'Psikologi', w:'Ubah cara melihat cabaran — kegagalan ialah sebahagian daripada belajar.'},
+      {t:'Feel the Fear and Do It Anyway', a:'Susan Jeffers', g:'Pembangunan diri', w:'Cara berdepan rasa takut dan tetap melangkah.'},
+      {t:'Atomic Habits', a:'James Clear', g:'Produktiviti', w:'Langkah kecil yang konsisten membina keyakinan sedikit demi sedikit.'}
+    ]
+  },
+  curious: {
+    emoji:'😲', title:'Penuh rasa ingin tahu',
+    desc:'Mata anda bersinar! Masa yang sesuai untuk buku yang membuka minda.',
+    books:[
+      {t:'Sapiens', a:'Yuval Noah Harari', g:'Sejarah', w:'Kisah ringkas tentang bagaimana manusia jadi seperti hari ini.'},
+      {t:'A Brief History of Time', a:'Stephen Hawking', g:'Sains', w:'Dari Big Bang ke lubang hitam, diterangkan untuk semua.'},
+      {t:'Bumi', a:'Tere Liye', g:'Fantasi', w:'Pengembaraan ke dunia paralel yang penuh kejutan.'}
+    ]
+  },
+  calm: {
+    emoji:'😌', title:'Tenang & fokus',
+    desc:'Anda kelihatan tenang. Sesuai untuk bacaan yang lebih mendalam dan berisi.',
+    books:[
+      {t:'Deep Work', a:'Cal Newport', g:'Produktiviti', w:'Manfaatkan fokus anda untuk kerja yang benar-benar bermakna.'},
+      {t:'The Psychology of Money', a:'Morgan Housel', g:'Kewangan', w:'Pelajaran tentang wang, tingkah laku dan keputusan hidup.'},
+      {t:'Sang Pemimpi', a:'Andrea Hirata', g:'Novel', w:'Kisah dua sahabat yang berani bermimpi tinggi.'}
+    ]
+  }
+};
+const SPINES = ['#b4532a','#2f5d50','#c99a2e','#5b4a8a','#8a3b3b','#3a6a8a'];
+
+let stream=null, ready=false, phase='idle', samples=[], resetTimer=null, tick=null;
+
+async function setup(){
+  $('ovStart').classList.add('hide'); $('ovLoad').classList.remove('hide');
+  try{
+    $('loadMsg').textContent='Membuka kamera…';
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    video.srcObject = stream;
+    await new Promise(r=>{ video.onloadedmetadata=r; if(video.readyState>=1) r(); });
+    await video.play();
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    if(!ready){
+      $('loadMsg').textContent='Memuatkan AI pengecam wajah…';
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+      ready = true;
+    }
+    $('ovLoad').classList.add('hide');
+    startScan();
+    loop();
+  }catch(e){
+    $('loadMsg').textContent='Tak dapat buka kamera: '+e.message;
+    setTimeout(()=>{ $('ovLoad').classList.add('hide'); $('ovStart').classList.remove('hide'); },3000);
+  }
+}
+
+function startScan(){
+  samples=[]; phase='waiting';
+  $('hint').textContent='Pandang ke kamera…';
+}
+
+const opts = new faceapi.TinyFaceDetectorOptions({inputSize:320, scoreThreshold:0.5});
+
+async function loop(){
+  if(!stream) return;
+  if(video.readyState>=2){
+    let det=null;
+    try{ det = await faceapi.detectSingleFace(video, opts).withFaceExpressions(); }catch(e){}
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(det && phase!=='done'){
+      const b = det.detection.box;
+      ctx.strokeStyle='#f6c66b'; ctx.lineWidth=Math.max(3,canvas.width/200);
+      roundRect(b.x,b.y,b.width,b.height,18); ctx.stroke();
+      if(phase==='waiting'){ phase='counting'; countdown(); }
+      if(phase==='counting') samples.push(det.expressions);
+    } else if(phase==='counting' && !det){
+      $('hint').textContent='Wajah hilang — pandang semula ke kamera';
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+function roundRect(x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+
+function countdown(){
+  let n=3; $('ovCount').classList.remove('hide'); $('countNum').textContent=n;
+  $('hint').textContent='Kekal begitu… sedang membaca riak wajah';
+  const iv = setInterval(()=>{
+    n--; if(n>0){ $('countNum').textContent=n; return; }
+    clearInterval(iv); $('ovCount').classList.add('hide');
+    if(samples.length<5){ $('hint').textContent='Tak cukup data — cuba lagi'; startScan(); return; }
+    finish();
+  },1000);
+}
+
+function finish(){
+  phase='done'; $('hint').textContent='';
+  const keys=['neutral','happy','sad','angry','fearful','disgusted','surprised'];
+  const avg={}; keys.forEach(k=>avg[k]=samples.reduce((s,e)=>s+(e[k]||0),0)/samples.length);
+
+  const happy = avg.happy;
+  const stress = Math.min(1, avg.angry + avg.disgusted + avg.fearful*0.8 + avg.sad*0.5);
+  const calm = Math.max(0, Math.min(1, avg.neutral*0.9 + avg.happy*0.3 - stress*0.3));
+
+  const groups = {
+    happy: avg.happy,
+    sad: avg.sad,
+    stress: avg.angry + avg.disgusted,
+    anxious: avg.fearful,
+    curious: avg.surprised,
+    calm: avg.neutral*0.85
+  };
+  const key = Object.entries(groups).sort((a,b)=>b[1]-a[1])[0][0];
+  showResult(MOODS[key], {happy, calm, stress});
+}
+
+function showResult(m, s){
+  $('rEmoji').textContent=m.emoji; $('rTitle').textContent=m.title; $('rDesc').textContent=m.desc;
+  const set=(id,nid,v)=>{ const p=Math.round(v*100); $(nid).textContent=p+'%'; setTimeout(()=>$(id).style.width=p+'%',50); };
+  ['mHappy','mCalm','mStress'].forEach(id=>$(id).style.width='0');
+  set('mHappy','nHappy',s.happy); set('mCalm','nCalm',s.calm); set('mStress','nStress',s.stress);
+
+  const wrap=$('books'); wrap.innerHTML='';
+  m.books.forEach((b,i)=>{
+    const el=document.createElement('div'); el.className='book';
+    const sp=document.createElement('div'); sp.className='spine'; sp.style.background=SPINES[(i+m.title.length)%SPINES.length];
+    const info=document.createElement('div');
+    const t=document.createElement('b'); t.textContent=b.t;
+    const a=document.createElement('div'); a.className='by'; a.textContent=b.a;
+    const w=document.createElement('div'); w.className='why'; w.textContent=b.w;
+    const g=document.createElement('span'); g.className='tag'; g.textContent=b.g;
+    info.append(t,a,w,g); el.append(sp,info); wrap.append(el);
+  });
+  $('result').classList.add('show');
+  $('result').scrollIntoView({behavior:'smooth',block:'start'});
+  autoReset(60);
+}
+
+function autoReset(sec){
+  clearInterval(tick); let left=sec;
+  $('timer').textContent=`Skrin akan reset dalam ${left} saat`;
+  tick=setInterval(()=>{ left--; $('timer').textContent=`Skrin akan reset dalam ${left} saat`; if(left<=0) reset(); },1000);
+}
+
+function again(){
+  clearInterval(tick); $('result').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'}); startScan();
+}
+
+function reset(){
+  clearInterval(tick); $('result').classList.remove('show');
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  video.srcObject=null; ctx.clearRect(0,0,canvas.width,canvas.height);
+  phase='idle'; $('hint').textContent='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  $('ovStart').classList.remove('hide');
+}
+
+$('btnStart').onclick=setup;
+$('btnAgain').onclick=again;
+$('btnDone').onclick=reset;
+</script>
+</body>
+</html>
