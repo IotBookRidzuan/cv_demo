@@ -490,7 +490,21 @@ padding:8px 10px;border-radius:9px;background:var(--kaca);border:1px solid var(-
 .aiRingkas b{color:var(--fg)}
 #pinKereta{position:fixed;inset:0;width:100vw;height:100vh;z-index:24;pointer-events:none}
 .pad button.dilalui{border-color:#F2C14E;box-shadow:0 0 0 1px #F2C14E,0 0 18px rgba(242,193,78,.45);color:#FFE19A}
+.klikKad{cursor:pointer;transition:transform .15s,border-color .2s,box-shadow .2s}
+.klikKad:hover{transform:translateY(-2px);border-color:var(--garisHi);box-shadow:0 14px 36px rgba(0,0,0,.35)}
+.kpi.klikKad::after{content:"View list ›";font:600 10px/1 var(--mono);letter-spacing:.06em;color:var(--dim);margin-top:2px}
+.kpi.klikKad:hover::after{color:var(--goldT)}
+.snRing{display:flex;gap:16px;flex-wrap:wrap;font:500 12.5px/1.3 var(--mono);color:var(--muted)}.snRing b{color:var(--goldT)}
+.snList{display:grid;gap:6px;max-height:62vh;overflow:auto}
+.snRow{appearance:none;display:grid;grid-template-columns:64px minmax(0,1fr) auto auto auto;gap:12px;align-items:center;width:100%;padding:7px 10px;border-radius:10px;border:1px solid transparent;background:var(--kaca2);text-align:left;cursor:pointer}
+.snRow:hover{border-color:var(--garisHi)}
+.snRow img{width:64px;height:42px;object-fit:cover;border-radius:6px}
+.snRow .a b{display:block;font:600 13.5px/1.2 var(--display)}
+.snRow small{display:block;font:500 10.5px/1.35 var(--mono);color:var(--dim)}
+.snRow .b{font:700 13px/1.2 var(--mono);text-align:right;white-space:nowrap}
+@media (max-width:640px){.snRow{grid-template-columns:56px minmax(0,1fr) auto}.snRow .b,.snRow .st{display:none}}
 .lgBtns{display:flex;
+
 
 
 gap:8px;justify-content:center;flex-wrap:wrap}
@@ -865,7 +879,9 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
         <div class="medan"><label for="rD">Cut &amp; patch, deeper than 50 mm (RM / m²)</label><input type="text" inputmode="decimal" id="rD" value="126"><small>Two premix layers.</small></div>
         <div class="medan"><label for="rS">Resurfacing for alligator cracks (RM / m²)</label><input type="text" inputmode="decimal" id="rS" value="60"></div>
         <div class="medan"><label for="rR">Crack sealing (RM / m)</label><input type="text" inputmode="decimal" id="rR" value="8"><small>Cracks wider than 20 mm are priced as a 30 cm patch strip.</small></div>
-        <div class="medan"><label for="rM">Mobilisation &amp; traffic control (RM / job)</label><input type="text" inputmode="decimal" id="rM" value="40"><small>Default rates follow a Selangor road-maintenance schedule of rates (JKH). A typical pothole costs about RM70–250. Replace with your district's rates.</small></div>
+        <div class="medan"><label for="rK">Repair method</label><select id="rK"><option value="kekal">Permanent (JKR standard cut &amp; patch)</option><option value="sementara">Temporary patch (cold premix)</option></select><small>Permanent: cut back 50 cm to sound pavement, minimum 2 m². Temporary: patch the hole only.</small></div>
+        <div class="medan"><label for="rM">Site visit, permanent repair (RM / visit)</label><input type="text" inputmode="decimal" id="rM" value="1800"><small>Crew, lorry, roller and traffic control for one site visit. One crew covers about 8 sites a day, so grouped repairs share this cost.</small></div>
+        <div class="medan"><label for="rN">Site visit, temporary patch (RM / visit)</label><input type="text" inputmode="decimal" id="rN" value="60"><small>Rates follow a Selangor road-maintenance schedule of rates (JKH). Replace with your district's rates.</small></div>
       </div></section>
       <section class="kaca br"><div class="hd"><h2>Display &amp; sound</h2></div><div class="bd">
         <div class="medan"><label for="tTema">Theme</label><select id="tTema"><option value="auto">Auto · day 7 am – 7 pm, night otherwise</option><option value="siang">Day (bright)</option><option value="malam">Night (dark)</option></select><small>Same layout and colours, tuned for daylight or night use.</small></div>
@@ -1264,19 +1280,24 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-id]"
 /* =================== PORTAL =================== */
 const STATUS = ["", "New", "Verified", "Under repair", "Repaired"];
 /* ---------- kos, kontraktor, trend, palsu ---------- */
-S.kadar = { tampal: 65, dalam: 126, turap: 60, retak: 8, mob: 40 }; S.hariSim = 0;
+S.kadar = { tampal: 65, dalam: 126, turap: 60, retak: 8, mobK: 1800, mobS: 60, kaedah: "kekal" }; S.hariSim = 0;
 const aktif = () => S.laporan.filter(l => !l.palsu);
 const RM = v => "RM " + Math.round(v).toLocaleString("en-MY");
-// Kos ikut jadual kadar penyelenggaraan jalan (rujukan: Jadual Kadar Harga tender Selangor, JKH B):
-//   potong & tampal premix <=50 mm ~RM65/m2, >50 mm (2 lapisan) ~RM126/m2, turap semula ~RM60/m2,
-//   bekal & baiki retakan ~RM8/m, mobilisasi + kawalan trafik ~RM40 sekali kerja.
+// Kos = bahan & kerja (ikut m2) + kos turun tapak (kru, lori, roller, kawalan trafik).
+//   Kaedah kekal (standard JKR): potong hingga turapan kukuh (+50 cm setiap sisi), min 2 m2, turun tapak ~RM1,800.
+//   Kaedah sementara (premix sejuk): tampal lubang sahaja (+15 cm), turun tapak kecil ~RM60.
+//   Satu kru boleh baiki ~8 lokasi sehari, jadi kos turun tapak dikongsi dalam laluan pembaikan.
+const SITE_SEHARI = 8;
+const mob = () => S.kadar.kaedah === "kekal" ? S.kadar.mobK : S.kadar.mobS;
 function kosDim(kod, p, l, d, luas) {
-  const k = S.kadar;
-  if (kod === "D40") { const a = Math.max(.25, (p / 100 + .3) * (l / 100 + .3)); return a * (d > 50 ? k.dalam : k.tampal) + k.mob; }
-  if (kod === "D20") { const a = Math.max(1, (p / 100 + .3) * (l / 100 + .3)); return a * k.turap * (d > 20 ? 1.2 : 1) + k.mob; }
-  const len = Math.max(1, p / 100); return d <= 20 ? len * k.retak + k.mob * .8 : len * .3 * k.tampal + k.mob;
+  const k = S.kadar, kk = k.kaedah === "kekal", tepi = kk ? 1.0 : .3, minA = kk ? 2 : .25;
+  if (kod === "D40") { const a = Math.max(minA, (p / 100 + tepi) * (l / 100 + tepi)); return a * (d > 50 ? k.dalam : k.tampal); }
+  if (kod === "D20") { const a = Math.max(kk ? 3 : 1, (p / 100 + tepi) * (l / 100 + tepi)); return a * k.turap * (d > 20 ? 1.2 : 1); }
+  const len = Math.max(1, p / 100); return d <= 20 ? len * k.retak : len * (kk ? .6 : .3) * k.tampal;
 }
-function kos(L) { const u = L.ukur; return kosDim(L.kod, u.p, u.l, u.d, u.luas); }
+function kosBahan(L) { const u = L.ukur; return kosDim(L.kod, u.p, u.l, u.d, u.luas); }
+function kos(L) { return kosBahan(L) + mob(); }              // kos jika dibaiki sebagai satu kerja berasingan
+function kosKumpulan(A) { return A.length ? A.reduce((a, L) => a + kosBahan(L), 0) + mob() * Math.ceil(A.length / SITE_SEHARI) : 0; }
 const KONTRAKTOR = ["Team A · Ipoh North", "Team B · Ipoh South", "Team C · Rapid patch unit"];
 const HARI = { H: 1, M: 7, L: 30 };
 const kini = () => new Date(Date.now() + S.hariSim * 864e5);
@@ -1312,7 +1333,7 @@ async function dl() { if (DLN) return DLN; try { DLN = window.claude && window.c
 async function simpan(nama, data) { const d = await dl(); if (!d) { if (window.claude) return false; try { const a = document.createElement("a"); a.href = URL.createObjectURL(typeof data === "string" ? new Blob([data], { type: "text/plain" }) : data); a.download = nama; document.body.append(a); a.click(); a.remove(); notis("✓ File saved", nama); return true; } catch (e) { return false; } } try { await d.save({ filename: nama, data }); notis("✓ File saved", nama); return true; } catch (e) { if (e && e.code === "declined") return true; if (e && e.code === "rate_limited") { notis("Please wait", "Another save is still open"); return true; } return false; } }
 function kiraPortal() {
   const A = aktif(); $("#pJum").textContent = A.length; ["H", "M", "L"].forEach(t => $("#p" + t).textContent = A.filter(l => l.ukur.tahap === t).length);
-  $("#pSel").textContent = A.filter(l => l.status === 4).length; $("#pKos").textContent = RM(A.filter(l => l.status < 4).reduce((a, l) => a + kos(l), 0));
+  $("#pSel").textContent = A.filter(l => l.status === 4).length; $("#pKos").textContent = RM(kosKumpulan(A.filter(l => l.status < 4)));
 }
 function saizPendek(L) { const u = L.ukur; return L.kod === "D40" ? Math.round(u.l) + "×" + Math.round(u.p) + " cm" : L.kod === "D20" ? u.luas.toFixed(1) + " m²" : (u.p / 100).toFixed(1) + " m"; }
 function lajurTrend(L) { const t = trend(L); if (!t) return '<span class="nota">—</span>'; const c = t.naik ? "var(--high)" : t.dd > 0 ? "var(--med)" : "var(--low)"; return `<span style="color:${c};font-family:var(--mono);font-weight:600">${t.dd >= 0 ? "▲ +" : "▼ "}${t.dd} mm${t.naik ? " ⇪" : ""}</span>`; }
@@ -1346,7 +1367,7 @@ function bukaModal(id) {
    <dl class="dl"><dt>Time</dt><dd>${L.masa.toLocaleString("en-GB")}</dd><dt>Size</dt><dd>${saizTeks(L)}</dd><dt>Area</dt><dd>${u.luas.toFixed(2)} m²</dd><dt>Confidence</dt><dd>${Math.round(L.conf * 100)}%</dd>
    <dt>GPS</dt><dd>${L.lat.toFixed(6)}, ${L.lon.toFixed(6)}<div class="navBtn"><button class="btn utama" type="button" data-peta="${L.id}">📍 Show on map</button><a class="btn" href="${navURL(L)}" target="_blank" rel="noopener">🧭 Navigate</a><a class="btn" href="${wazeURL(L)}" target="_blank" rel="noopener">Waze</a></div></dd>
    <dt>Calibration</dt><dd>${L.import ? `<span style="color:var(--goldT)">Imported from P08 log (${L.import}) · size not measured, typical values used</span>` : u.kal ? `<span style="color:var(--low)">✓ Calibrated · scale error ${u.kalE}%</span>` : `<span style="color:var(--high)">⚠ Not calibrated · scale error ${u.kalE}%</span>`}</dd>
-   <dt>Est. cost</dt><dd><span class="kos">${RM(kos(L))}</span><br><span class="nota">${L.kod === "D40" ? `cut &amp; patch ${L.ukur.d > 50 ? "(2 layers) " : ""}+15 cm margin` : L.kod === "D20" ? "resurfacing area" : L.ukur.d > 20 ? "30 cm patch strip" : "crack sealing per metre"} + mobilisation · schedule of rates</span></dd></dl>
+   <dt>Est. cost</dt><dd><span class="kos">${RM(kos(L))}</span><br><span class="nota">${L.kod === "D40" ? `cut &amp; patch ${L.ukur.d > 50 ? "(2 layers) " : ""}+15 cm margin` : L.kod === "D20" ? "resurfacing area" : L.ukur.d > 20 ? "30 cm patch strip" : "crack sealing per metre"} · ${S.kadar.kaedah === "kekal" ? "permanent repair" : "temporary patch"} as a single job (RM ${Math.round(mob()).toLocaleString("en-MY")} site visit). Cheaper when grouped in a repair route.</span></dd></dl>
    <div class="tindak" style="border-left-color:${WARNA[u.tahap]}">${TINDAKAN[u.tahap]}</div>
    ${L.palsu ? "" : aiBlok(L)}
    ${L.palsu ? "" : `<div class="wo"><h3>JKR work order</h3>
@@ -1387,8 +1408,8 @@ function bar(c, data, maksH, fmt) { // data: [{l, v, c}]
 }
 function lukisAnalitik() {
   const A = aktif(), F = S.laporan.filter(l => l.palsu);
-  const kt = { H: 0, M: 0, L: 0 }; A.filter(l => l.status < 4).forEach(l => kt[l.ukur.tahap] += kos(l));
-  const terbuka = A.filter(l => l.status < 4), R0 = terbuka.map(ramalan), jum = k => R0.reduce((a, f) => a + f[k], 0);
+  const kt = {}; ["H", "M", "L"].forEach(t => kt[t] = kosKumpulan(A.filter(l => l.status < 4 && l.ukur.tahap === t)));
+  const terbuka = A.filter(l => l.status < 4), R0 = terbuka.map(ramalan), jum = k => R0.reduce((a, f) => a + f[k] - mob(), 0) + mob() * Math.ceil(R0.length / SITE_SEHARI);
   bar($("#cTangguh"), [["Repair now", "k0", "#36D67A"], ["In 30 days", "k30", "#F2C14E"], ["In 90 days", "k90", "#FFA21F"], ["In 180 days", "k180", "#FF3B4E"]].map(([l, k, c]) => ({ l, v: Math.round(jum(k)), c })), 0, v => "RM " + v.toLocaleString("en-MY"));
   $("#tangguhNota").textContent = terbuka.length ? `Delaying all ${terbuka.length} open repairs by 90 days would add about ${RM(jum("k90") - jum("k0"))} (+${jum("k0") ? Math.round((jum("k90") / jum("k0") - 1) * 100) : 0}%). ${R0.filter(f => f.hariK !== null && f.hariK > 0 && f.hariK <= 30).length} defects are forecast to turn critical within 30 days.` : "No open defects.";
   bar($("#cKos"), ["H", "M", "L"]
@@ -1633,7 +1654,7 @@ async function laporanHarian() {
   teks("Smart Road Inspection System · Politeknik Ungku Omar · C-TeCH · simulated data", 60, 166, "500 17px 'JetBrains Mono',monospace", "#AEB7D2");
   [["Date", d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" })], ["Route", (S.gpsLive ? "Live GPS" : diPUO() ? "PUO demo loop" : "Custom route") + " · " + (S.s / 1000).toFixed(2) + " km"], ["Operator", NAMA[S.peranan] || "—"], ["Calibration", S.kal.done ? "✓ Calibrated · ±" + (S.kal.errAbs * 100).toFixed(1) + "%" : "⚠ Not calibrated"]].forEach(([k, v], i) => { teks(k.toUpperCase(), 820, 58 + i * 36, "600 14px 'JetBrains Mono',monospace", "#5F7389"); teks(v, 960, 58 + i * 36, "600 17px 'Geist',sans-serif", "#EAF4FB"); });
   // KPI
-  const kpi = [["Defects", A.length, "#0b1524"], ["Critical", A.filter(l => l.ukur.tahap === "H").length, "#d61f33"], ["Moderate", A.filter(l => l.ukur.tahap === "M").length, "#d97b00"], ["Low", A.filter(l => l.ukur.tahap === "L").length, "#1f9d57"], ["Road index", ikj(), "#0a7ea4"], ["Budget", RM(A.filter(l => l.status < 4).reduce((a, l) => a + kos(l), 0)), "#8a6400"]];
+  const kpi = [["Defects", A.length, "#0b1524"], ["Critical", A.filter(l => l.ukur.tahap === "H").length, "#d61f33"], ["Moderate", A.filter(l => l.ukur.tahap === "M").length, "#d97b00"], ["Low", A.filter(l => l.ukur.tahap === "L").length, "#1f9d57"], ["Road index", ikj(), "#0a7ea4"], ["Budget", RM(kosKumpulan(A.filter(l => l.status < 4))), "#8a6400"]];
   kpi.forEach(([k, v, col], i) => { const X = 60 + i * 190; x.fillStyle = "#f2f5f9"; x.fillRect(X, 225, 175, 110); x.fillStyle = col; x.fillRect(X, 225, 6, 110); teks(k.toUpperCase(), X + 20, 258, "600 14px 'JetBrains Mono',monospace", "#5F7389"); teks(String(v), X + 20, 312, (String(v).length > 7 ? "700 28px" : "700 44px") + " 'Chakra Petch',sans-serif", col); });
   // peta
   teks("DEFECT MAP", 60, 384, "700 16px 'JetBrains Mono',monospace", "#0a7ea4"); x.fillStyle = "#06101d"; x.fillRect(60, 398, 640, 420);
@@ -1723,7 +1744,8 @@ function hentiDemo(senyap) { DEMO.on = false; DEMO.id++; $("#demoBar").hidden = 
 $("#lgDemo").onclick = () => mulaDemo(); $("#cDemo").onclick = () => DEMO.on ? hentiDemo() : mulaDemo(); $("#dStop").onclick = () => hentiDemo();
 addEventListener("keydown", e => { if (e.key === "Escape" && DEMO.on) hentiDemo(); });
 // kadar kos
-[["#rT", "tampal"], ["#rD", "dalam"], ["#rS", "turap"], ["#rR", "retak"], ["#rM", "mob"]].forEach(([id, k]) => $(id).oninput = e => { const v = parseFloat(e.target.value); if (v > 0) { S.kadar[k] = v; kemasSemua(); } });
+$("#rK").onchange = e => { S.kadar.kaedah = e.target.value; audit(`Repair method: ${e.target.value === "kekal" ? "permanent" : "temporary"}`); kemasSemua(); };
+[["#rT", "tampal"], ["#rD", "dalam"], ["#rS", "turap"], ["#rR", "retak"], ["#rM", "mobK"], ["#rN", "mobS"]].forEach(([id, k]) => $(id).oninput = e => { const v = parseFloat(e.target.value); if (v > 0) { S.kadar[k] = v; kemasSemua(); } });
 
 /* =================== AI: RAMALAN KEMEROSOTAN =================== */
 // Kadar kemerosotan asas (mm sehari, linear) - lubang membesar di bawah trafik, lebih cepat musim hujan
@@ -1738,7 +1760,7 @@ function ramalan(L) {
   const dMaks = L.kod === "D40" ? 100 : 40, kadarLuas = L.kod === "D40" ? .003 : L.kod === "D20" ? .004 : .002, gMaks = L.kod === "D10" || L.kod === "D00" ? 1.5 : 1.8;
   const dAt = t => Math.min(dMaks, u.d + r * t), gS = t => Math.min(gMaks, 1 + kadarLuas * ms * t);
   const tahapAt = t => { const d = dAt(t), g = gS(t); if (L.kod === "D40") return tahapLubang(Math.max(u.p, u.l) * g, d); if (L.kod === "D20") return tahapRetak("D20", d, u.luas * g * g); return tahapRetak(L.kod, d, 0); };
-  const kosAt = t => { const g = gS(t), d = dAt(t); return kosDim(L.kod, u.p * g, L.kod === "D40" || L.kod === "D20" ? u.l * g : u.l, d, u.luas * g * g); };
+  const kosAt = t => { const g = gS(t), d = dAt(t); return mob() + kosDim(L.kod, u.p * g, L.kod === "D40" || L.kod === "D20" ? u.l * g : u.l, d, u.luas * g * g); };
   let hariK = null, hariNaik = null; const t0 = u.tahap;
   if (t0 === "H") hariK = 0;
   for (let t = 1; t <= 365 && (hariK === null || hariNaik === null); t++) { const s = tahapAt(t); if (hariNaik === null && "LMH".indexOf(s) > "LMH".indexOf(t0)) hariNaik = t; if (hariK === null && s === "H") hariK = t; }
@@ -1947,7 +1969,7 @@ function pjPanel() {
     const s = PJ.baiki, v = kedudukan(S.s); let jum = 0, kini2 = [v.lat, v.lon]; const baris = s.map((L, i) => { const d = jarakM(kini2, [L.lat, L.lon]); jum += d; kini2 = [L.lat, L.lon]; return `<button class="lmRow" type="button" data-pj="${L.id}"><span class="lmNo">${i + 1}</span><span><b>${L.jenis} · ${TAHAP[L.ukur.tahap]}</b>${L.id} · +${d < 1000 ? Math.round(d) + " m" : (d / 1000).toFixed(1) + " km"}</span><em style="color:${warnaSkor(ramalan(L).skor)}">${ramalan(L).skor}</em></button>`; }).join("");
     el.innerHTML = `<p class="nota" style="margin:0 0 10px">Builds a repair run for the crew: the highest AI-priority defects, visited in nearest-first order from the vehicle.</p>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="btn utama" type="button" id="rb5">Plan 5 stops</button><button class="btn" type="button" id="rb9">Plan 9 stops</button>${s.length ? '<button class="btn" type="button" id="rbX">Clear</button>' : ""}</div>
-      ${s.length ? `<div class="lmSum"><div><b>${s.length}</b><span>Stops</span></div><div><b>${(jum / 1000).toFixed(1)} km</b><span>Straight-line</span></div><div><b>${RM(s.reduce((a, L) => a + kos(L), 0))}</b><span>Est. cost</span></div></div>
+      ${s.length ? `<div class="lmSum"><div><b>${s.length}</b><span>Stops</span></div><div><b>${(jum / 1000).toFixed(1)} km</b><span>Straight-line</span></div><div><b>${RM(kosKumpulan(s))}</b><span>Est. cost · 1 crew</span></div></div>
       <div style="display:grid;gap:6px;margin:10px 0">${baris}</div><a class="btn emas" href="${gmapLaluan()}" target="_blank" rel="noopener" style="width:100%;justify-content:center">🧭 Open route in Google Maps</a><p class="nota" style="margin:8px 0 0">Google Maps gives turn-by-turn directions on the phone. Each stop also has Navigate and Waze buttons in its popup.</p>` : '<div class="kosong">No route yet.</div>'}`;
     const a = $("#rb5"), b = $("#rb9"), c = $("#rbX"); if (a) a.onclick = () => rancangBaiki(5); if (b) b.onclick = () => rancangBaiki(9); if (c) c.onclick = () => { PJ.baiki = []; pjPanel(); pjLukis(); };
   } else {
@@ -2295,6 +2317,27 @@ function kpDetik(now) {
 }
 kpSaiz(); requestAnimationFrame(kpDetik);
 $("#kunci").addEventListener("click", () => { kpReset(); KP.siap = false; KP.lulus = null; });
+
+/* =================== SENARAI DARI KAD KPI =================== */
+const SENARAI = {
+  hJum: ["All detected defects", () => aktif()], hKrit: ["Critical defects", () => aktif().filter(l => l.ukur.tahap === "H" && l.status < 4)],
+  hHantar: ["Reports received by JKR", () => aktif().filter(l => l.hantar)], hIkj: ["Defects lowering the road index", () => aktif().filter(l => l.status < 4)],
+  pJum: ["All reports", () => aktif()], pH: ["Critical defects", () => aktif().filter(l => l.ukur.tahap === "H")], pM: ["Moderate defects", () => aktif().filter(l => l.ukur.tahap === "M")],
+  pL: ["Low defects", () => aktif().filter(l => l.ukur.tahap === "L")], pSel: ["Repaired", () => aktif().filter(l => l.status === 4)], pKos: ["Open repairs by cost", () => aktif().filter(l => l.status < 4).sort((a, b) => kos(b) - kos(a))],
+  kLubang: ["Potholes", () => aktif().filter(l => l.kod === "D40")], kRetak: ["Cracks", () => aktif().filter(l => l.kod !== "D40")], kKrit: ["Critical defects", () => aktif().filter(l => l.ukur.tahap === "H")],
+};
+function bukaSenarai(k) {
+  const [tajuk, f] = SENARAI[k], A = f(), jumKos = kosKumpulan(A.filter(l => l.status < 4));
+  $("#mTajuk").textContent = `${tajuk} · ${A.length}`;
+  $("#mIsi").innerHTML = `<div style="grid-column:1/-1;display:grid;gap:10px">
+    <div class="snRing"><span>${A.length} item${A.length === 1 ? "" : "s"}</span><span>Open repair cost <b>${RM(jumKos)}</b></span><span>${A.filter(l => l.ukur.tahap === "H").length} critical</span></div>
+    ${A.length ? `<div class="snList">${A.map(L => { const s = L.status < 4 ? ramalan(L).skor : null; return `<button class="snRow" type="button" data-sn="${L.id}"><img alt="" src="${L.crop}"><span class="a"><b>${L.jenis}</b><small>${L.id} · ${L.masa.toLocaleTimeString("en-GB")} · ${saizTeks(L)}</small></span><span class="lencana kecil ${L.ukur.tahap}">${TAHAP[L.ukur.tahap]}</span><span class="b">${RM(kos(L))}<small>${s == null ? "repaired" : "AI " + s}</small></span><span class="st s${L.status}">${STATUS[L.status]}</span></button>`; }).join("")}</div>` : '<div class="kosong">Nothing in this list yet.</div>'}
+    <p class="nota" style="margin:0">Click a row to open its full report. 📍 on the report shows it on the map.</p></div>`;
+  $$("#mIsi [data-sn]").forEach(b => b.onclick = () => bukaModal(b.dataset.sn));
+  if (!$("#modal").open) $("#modal").showModal();
+}
+Object.keys(SENARAI).forEach(k => { const el = $("#" + k); if (!el) return; const kad = el.closest(".kpi") || el.parentElement; kad.classList.add("klikKad"); kad.setAttribute("role", "button"); kad.tabIndex = 0; kad.title = "Show list";
+  kad.addEventListener("click", () => bukaSenarai(k)); kad.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); bukaSenarai(k); } }); });
 
 /* =================== GELUNG UTAMA =================== */
 let tAkhir = performance.now(), bingkai = 0;
