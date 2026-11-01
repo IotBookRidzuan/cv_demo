@@ -69,7 +69,10 @@ width:auto;display:block}
 .lgKad{animation:kadMasuk 1s .3s cubic-bezier(.2,.8,.2,1) both}
 @keyframes kadMasuk{from{opacity:0;transform:translateX(40px) scale(.96);filter:blur(10px)}}
 .maskot{position:relative;animation:naikMasuk .8s .6s both}
-#lgMaskot{width:100%;height:170px;display:block}
+#lgMaskot{width:100%;height:190px;display:block}
+.hudStatus{display:inline-flex;align-items:center;gap:8px;margin-top:4px;padding:6px 10px;border-radius:6px;border:1px solid rgba(90,169,255,.35);background:rgba(8,16,30,.6);font:600 11px/1.2 var(--mono);letter-spacing:.08em;color:#9fc8ff}
+.hudStatus::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;animation:kelip 1s steps(2) infinite}
+.hudStatus.auth{color:#FFE19A;border-color:rgba(242,193,78,.5)}.hudStatus.err{color:#FF8A95;border-color:rgba(255,59,78,.6)}.hudStatus.ok{color:#5BE3A6;border-color:rgba(54,214,122,.6)}
 .gelembung{position:absolute;left:var(--gx,30%);top:2px;transform:translateX(-50%);padding:7px 12px;border-radius:14px 14px 14px 4px;background:#fff;color:#14203a;font:600 12.5px/1.2 var(--body);white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.3);transition:left .2s linear;animation:gelembungMasuk .4s cubic-bezier(.3,1.6,.5,1)}
 .gelembung.tukar{animation:gelembungMasuk .4s cubic-bezier(.3,1.6,.5,1)}
 @keyframes gelembungMasuk{from{transform:translateX(-50%) scale(.4);opacity:0}}
@@ -213,8 +216,37 @@ main.hlm{margin-left:var(--rail);padding:6px 20px 30px}
 .kolum{display:grid;gap:16px}
 .salam{padding:22px}
 .salam small{font:600 11px/1 var(--mono);letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
-.salam h1{margin:10px 0 8px;font:700 clamp(30px,3.6vw,44px)/1 var(--display)}
-.salam p{margin:0 0 16px;color:var(--muted)}
+.salam{padding:18px}
+.salam h1{margin:8px 0 6px;font:700 clamp(22px,2.2vw,28px)/1.1 var(--display)}
+.salam p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.salam .misiInfo{margin:8px 0 10px}
+.cuacaBaris{font:500 12.5px/1.4 var(--body);color:var(--muted);padding:8px 10px;border-radius:8px;background:var(--kaca2);margin-bottom:12px}
+.cuacaBaris b{color:var(--fg)}
+.salamBtn{display:flex;gap:8px;flex-wrap:wrap}
+.mpWrap{padding:0;overflow:hidden}
+.mp{position:relative;height:calc(100vh - 330px);min-height:420px;overflow:hidden;touch-action:none;cursor:grab;background:#dfe3e8;border-radius:14px}
+[data-mod="malam"] .mp{background:#0d1526}
+.mp.tanpaJubin{background:radial-gradient(90% 80% at 50% 40%,rgba(90,169,255,.1),transparent),var(--kaca2)}
+.mp canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mpNav{position:absolute;left:12px;top:12px;right:120px;max-width:440px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:#0F2350;color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.35);border-left:5px solid var(--gold)}
+.mpNav.H{background:linear-gradient(90deg,#7a1020,#0F2350);border-left-color:#FF3B4E}.mpNav.M{border-left-color:#FFA21F}.mpNav.L{border-left-color:#36D67A}.mpNav.ok{border-left-color:#36D67A}
+.mpNav .ar{font-size:22px;color:#FFE19A}
+.mpNav b{display:block;font:700 16px/1.2 var(--display);letter-spacing:.02em}
+.mpNav small{display:block;font:500 11.5px/1.35 var(--mono);color:#C3CCE6}
+.mpLaju{position:absolute;left:12px;bottom:26px;width:64px;height:64px;border-radius:50%;background:#fff;color:#0E1430;display:grid;place-content:center;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,.35);border:3px solid #3d8fe6}
+.mpLaju b{font:700 22px/1 var(--display)}.mpLaju small{font:600 9px/1 var(--mono);color:#46506F}
+.mpNota{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:6px 10px;border-radius:8px;background:var(--kaca);border:1px solid var(--garisHi);font:600 11px/1.2 var(--mono);color:var(--cyan);white-space:nowrap}
+.mpCtl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.mpCtl .btn{background:var(--kaca);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);min-width:40px;justify-content:center}
+.dpn{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center}
+.dpn img{width:96px;height:64px;object-fit:cover;border-radius:8px}
+.dpn .t{display:flex;align-items:center;gap:6px;font:600 13.5px/1.2 var(--display)}
+.dpn .jr{display:block;font:700 28px/1.1 var(--display);color:var(--goldT);margin:4px 0}
+.dpn small{font:500 11px/1.35 var(--mono);color:var(--muted)}
+#depanKad .bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#depanKad .bt .btn{padding:6px 9px;font-size:11.5px}
+@media (max-width:860px){.mp{height:58vh;min-height:340px}.mpNav{right:60px}}
+
 .prog{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
 .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--gold));box-shadow:0 0 12px var(--cyan)}
 .misiInfo{display:flex;justify-content:space-between;font:500 11.5px/1 var(--mono);color:var(--muted);margin:10px 0 18px}
@@ -539,7 +571,7 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
     <h1>ROAD<br>SCAN<span>-08</span></h1>
     <p>Smart road inspection system. AI detects potholes and cracks, measures their size and depth, tags the GPS location and sends each report straight to JKR (Public Works Department).</p>
     <div class="ciri"><span>YOLOv8 · RDD2022</span><span>Depth scanning</span><span>Auto GPS tagging</span><span>JKR uplink</span></div>
-    <div class="maskot"><canvas id="lgMaskot" aria-label="Scanny, the ROADSCAN mascot, driving and tagging potholes"></canvas><div class="gelembung" id="gelembung">Hi! I'm Scanny 👋</div></div>
+    <div class="maskot"><canvas id="lgMaskot" aria-label="Animated sensor view: the vehicle scans the road, the AI boxes each defect and sends it to JKR"></canvas><div class="hudStatus" id="gelembung">SCANNING ROAD SURFACE · YOLOv8-S RDD · 30 FPS</div></div>
     <div class="boot" id="boot"></div>
   </div>
   <div class="lgKad">
@@ -604,13 +636,15 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
         <section class="kaca br salam">
           <small id="salamKecil">Mission R-0811 · Night patrol</small>
           <h1 id="salam">Welcome</h1>
-          <p><span id="misiLaluan">Demo patrol route around Politeknik Ungku Omar, Ipoh</span>. The unit is scanning the road surface automatically.</p>
+          <p><span id="misiLaluan">Demo patrol route around Politeknik Ungku Omar, Ipoh</span></p>
           <div class="prog"><i id="progMisi"></i></div>
           <div class="misiInfo"><span id="misiJarak">0.00 / 4.60 km</span><span id="misiPct">0%</span></div>
-          <button class="btn utama" type="button" data-pergi="kokpit">▶ Enter patrol cockpit</button>
+          <div class="cuacaBaris" id="cuacaBaris">Weather forecast loading…</div>
+          <div class="salamBtn"><button class="btn utama" type="button" data-pergi="kokpit">▶ Patrol cockpit</button><button class="btn" type="button" data-pergi="live">🧭 Repair route</button></div>
         </section>
+        <section class="kaca br"><div class="hd"><h2>Next defect ahead</h2><span class="r" id="depanR">—</span></div><div class="bd" id="depanKad"><div class="kosong">No open defects ahead. Road clear.</div></div></section>
         <div class="kpi4">
-          <div class="kaca kpi"><span>Detected</span><b id="hJum">0</b><small>defects</small></div>
+          <div class="kaca kpi"><span>Detected</span><b id="hJum">0</b><small>defects today</small></div>
           <div class="kaca kpi"><span>Critical</span><b id="hKrit" style="color:var(--high)">0</b><small>action within 24 h</small></div>
           <div class="kaca kpi"><span>Sent to JKR</span><b id="hHantar" style="color:var(--low)">0</b><small>reports received</small></div>
           <div class="kaca kpi"><span>Road index</span><b id="hIkj" style="color:var(--cyan)">100</b><small>0 = poor · 100 = good</small></div>
@@ -618,19 +652,27 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
       </div>
       <div class="tengah">
         <div class="tgBar">
-          <div class="seg" id="tgSeg" role="group" aria-label="Main view"><button type="button" data-v="live" class="on">📹 Live view</button><button type="button" data-v="3d">🛰 3D Digital Twin</button></div>
-          <span class="tgInfo" id="tgInfo">CAM-01 · YOLOv8-S RDD · real-time detection</span>
-          <button class="btn" type="button" data-pergi="kokpit">⤢ Open cockpit</button>
+          <div class="seg" id="tgSeg" role="group" aria-label="Main view"><button type="button" data-v="peta" class="on">🗺 Map</button><button type="button" data-v="live">📹 Live camera</button><button type="button" data-v="3d">🛰 3D Twin</button></div>
+          <span class="tgInfo" id="tgInfo">Live map · vehicle, defects and routes</span>
+          <button class="btn" type="button" data-pergi="kokpit">⤢ Cockpit</button>
         </div>
-        <div class="kaca br tgPentas lut" id="tgPentas"><canvas id="pipBesar"></canvas><span class="t3" id="tgT3">◇ LIVE · CAM-01 ◇</span></div>
+        <div class="kaca br mpWrap" id="mpWrap">
+          <div class="mp" id="mpPeta"><div class="lmTiles"></div><canvas></canvas>
+            <div class="mpNav" id="mpNav"></div>
+            <div class="mpLaju" id="mpLaju"><b>0</b><small>km/h</small></div>
+            <div class="mpCtl"><button class="btn on" id="mpIkut" type="button" title="Follow vehicle">🎯</button><button class="btn" id="mpPlus" type="button" aria-label="Zoom in">＋</button><button class="btn" id="mpMinus" type="button" aria-label="Zoom out">－</button><button class="btn" id="mpBesar" type="button">⤢ Full map</button></div>
+            <div class="lmAttr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
+          </div>
+        </div>
+        <div class="kaca br tgPentas lut" id="tgPentas" hidden><canvas id="pipBesar"></canvas><span class="t3" id="tgT3">◇ LIVE · CAM-01 ◇</span></div>
         <section class="kaca br"><div class="hd"><h2>🤖 AI analysis</h2><span class="r" id="cuacaR">weather…</span></div><div class="bd aiMisi" id="aiMisi"><div class="kosong">The AI briefing appears after the first detections.</div></div></section>
       </div>
       <div class="kolum">
-        <section class="kaca br"><div class="hd"><h2 id="miniTajuk">3D Digital Twin</h2><span class="r">tap to swap</span></div><div class="bd"><div class="pip" id="miniPip" role="button" tabindex="0" aria-label="Swap main view"><canvas id="pip" width="480" height="270"></canvas><span class="lblL biru" id="miniLbl">◇ 3D</span><span class="tukar">⇄ SWAP</span></div></div></section>
+        <section class="kaca br"><div class="hd"><h2 id="miniTajuk">Live camera</h2><span class="r">tap to enlarge</span></div><div class="bd"><div class="pip" id="miniPip" role="button" tabindex="0" aria-label="Swap main view"><canvas id="pip" width="480" height="270"></canvas><span class="lblL" id="miniLbl">● LIVE</span><span class="tukar">⇄ SWAP</span></div></div></section>
         <section class="kaca br"><div class="hd"><h2>Critical notifications</h2><span class="r"><button class="btn" id="notifBaca" type="button" style="padding:5px 9px;font-size:11px">Mark all read</button></span></div><div class="bd"><div class="notif" id="notif"><div class="kosong">No critical notifications.</div></div></div></section>
         <section class="kaca br"><div class="hd"><h2>Latest alerts</h2><span class="r" id="hAmaranN">0</span></div><div class="bd"><div class="amaran" id="hAmaran"><div class="kosong">Waiting for the first detection…</div></div></div></section>
         <div class="cepat">
-          <button type="button" data-pergi="live"><span class="ik">🗺</span><b>Live map</b><small>Vehicle · defects · routes</small></button>
+          <button type="button" data-pergi="live"><span class="ik">🗺</span><b>Live map</b><small>Search · satellite · GPS</small></button>
           <button type="button" data-pergi="portal"><span class="ik">🏛</span><b>JKR Portal</b><small>Review reports</small></button>
         </div>
       </div>
@@ -1005,8 +1047,8 @@ function lukis3D(dt, now) {
   // kenderaan
   const v = p3(vx, .4, vz);
   if (v) {
-    const pr = (now / 1400) % 1; b3.strokeStyle = "#5AA9FF"; b3.globalAlpha = .8 * (1 - pr); b3.lineWidth = 1.5; b3.beginPath();
-    for (let i = 0; i <= 24; i++) { const q = p3(vx + Math.cos(i / 24 * 6.283) * (1 + pr * 9), 0, vz + Math.sin(i / 24 * 6.283) * (1 + pr * 9)); if (q) i ? b3.lineTo(q[0], q[1]) : b3.moveTo(q[0], q[1]); } b3.stroke(); b3.globalAlpha = 1;
+    if (B3.mod !== "login") { const pr = (now / 1400) % 1; b3.strokeStyle = "#5AA9FF"; b3.globalAlpha = .8 * (1 - pr); b3.lineWidth = 1.5; b3.beginPath();
+    for (let i = 0; i <= 24; i++) { const q = p3(vx + Math.cos(i / 24 * 6.283) * (1 + pr * 9), 0, vz + Math.sin(i / 24 * 6.283) * (1 + pr * 9)); if (q) i ? b3.lineTo(q[0], q[1]) : b3.moveTo(q[0], q[1]); } b3.stroke(); b3.globalAlpha = 1; }
     if (B3.mod !== "login") { const rg = b3.createRadialGradient(v[0], v[1], 0, v[0], v[1], 26); rg.addColorStop(0, "rgba(90,169,255,.9)"); rg.addColorStop(1, "rgba(90,169,255,0)"); b3.fillStyle = rg; b3.fillRect(v[0] - 26, v[1] - 26, 52, 52); b3.fillStyle = "#EAF4FB"; b3.beginPath(); b3.arc(v[0], v[1], 3.5, 0, 7); b3.fill(); }
   }
   if (B3.mod === "login") { // lorong jalan dekat untuk rasa memandu
@@ -1200,7 +1242,7 @@ function kemasSemua() {
   $("#kLubang").textContent = A.filter(l => l.kod === "D40").length; $("#kRetak").textContent = A.filter(l => l.kod !== "D40").length; $("#kKrit").textContent = krit; $("#kKm").textContent = (A.length / Math.max(.1, S.s / 1000)).toFixed(1);
   // misi
   $("#hJum").textContent = A.length; $("#hKrit").textContent = krit; $("#hHantar").textContent = A.filter(l => l.hantar).length; $("#hIkj").textContent = ikj(); $("#hAmaranN").textContent = A.length;
-  paparNotif(); paparAIMisi();
+  paparNotif(); paparAIMisi(); paparDepan();
   $("#hAmaran").innerHTML = A.length ? A.slice(0, 6).map(L => `<button type="button" data-id="${L.id}"><img alt="" src="${L.crop}"><div><b><span class="lencana kecil ${L.ukur.tahap}">${TAHAP[L.ukur.tahap]}</span>${L.jenis}</b><small>${saizTeks(L)} · ${L.masa.toLocaleTimeString("en-GB")}</small></div></button>`).join("") : `<div class="kosong">Waiting for the first detection…</div>`;
   // badge JKR
   const baru = A.filter(l => l.status === 1).length; $("#bdg").hidden = !baru; $("#bdg").textContent = baru > 99 ? "99+" : baru;
@@ -1364,7 +1406,7 @@ function pergi(h) {
   B3.mod = h === "peta" ? "peta" : h === "misi" ? "misi" : "lain";
   document.body.classList.toggle("redup", !["misi", "peta"].includes(h)); latarMisi();
   bip(1200, 40, .03);
-  requestAnimationFrame(() => { saizKanvasUI(); if (h === "portal") paparPortal(); if (h === "analitik") lukisAnalitik(); if (h === "kal") kalPanel(); if (h === "tetapan") paparAudit(); if (h === "live") { pjSaiz(); pjPanel(); } });
+  requestAnimationFrame(() => { saizKanvasUI(); if (h === "portal") paparPortal(); if (h === "analitik") lukisAnalitik(); if (h === "kal") kalPanel(); if (h === "tetapan") paparAudit(); if (h === "live") { pjSaiz(); pjPanel(); } if (h === "misi" && S.tg === "peta" && mSaiz(MP)) { mTiles(MP); mLukis(MP); } });
   scrollTo({ top: 0 });
 }
 $$(".nav[data-h]").forEach(n => n.onclick = () => pergi(n.dataset.h));
@@ -1968,16 +2010,16 @@ S.ack = new Set(); S.cuaca = null; S.jalan = {};
 async function ambilCuaca() {
   const v = kedudukan(S.s);
   try {
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${v.lat.toFixed(3)}&longitude=${v.lon.toFixed(3)}&hourly=precipitation_probability,precipitation&forecast_days=2&timezone=auto`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${v.lat.toFixed(3)}&longitude=${v.lon.toFixed(3)}&current=temperature_2m&hourly=precipitation_probability,precipitation&forecast_days=2&timezone=auto`);
     const d = await r.json(), t = d.hourly.time, pr = d.hourly.precipitation_probability, mm = d.hourly.precipitation, kini2 = Date.now();
     let i = t.findIndex((s, k) => new Date(s).getTime() > kini2 - 3600e3 && pr[k] >= 50);
-    const depan = pr.filter((_, k) => { const tt = new Date(t[k]).getTime(); return tt > kini2 - 3600e3 && tt < kini2 + 24 * 3600e3; });
-    S.cuaca = i >= 0 ? { jam: new Date(t[i]), prob: pr[i], mm: mm[i], sumber: "Open-Meteo forecast" } : { jam: null, prob: depan.length ? Math.max(...depan) : 0, sumber: "Open-Meteo forecast" };
+    const dep = pr.filter((_, k) => { const tt = new Date(t[k]).getTime(); return tt > kini2 - 3600e3 && tt < kini2 + 24 * 3600e3; });
+    S.cuaca = i >= 0 ? { jam: new Date(t[i]), prob: pr[i], mm: mm[i], sumber: "Open-Meteo forecast" } : { jam: null, prob: dep.length ? Math.max(...dep) : 0, sumber: "Open-Meteo forecast" }; S.cuaca.suhu = d.current ? Math.round(d.current.temperature_2m) : null;
   } catch (e) {
     const j = new Date(); j.setMinutes(0, 0, 0); if (j.getHours() >= 15) { j.setDate(j.getDate() + 1); } j.setHours(15);
-    S.cuaca = { jam: j, prob: 75, mm: 6, sumber: "typical afternoon thunderstorm (simulated: live forecast works in the hosted version)" };
+    S.cuaca = { jam: j, prob: 75, mm: 6, suhu: 31, sim: true, sumber: "typical afternoon thunderstorm (simulated: live forecast works in the hosted version)" };
   }
-  const c = S.cuaca; $("#cuacaR").textContent = c.jam ? `🌧 Rain ${c.jam.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · ${c.prob}%` : `☀ No heavy rain forecast · max ${c.prob}%`;
+  const c = S.cuaca; $("#cuacaBaris").innerHTML = `${c.suhu != null ? `<b>${c.suhu}°C</b> · ` : ""}${c.jam ? `🌧 Rain expected <b>${fmtJam(c.jam)}</b> (${c.prob}%)` : `☀ No heavy rain in the next 24 h`}${c.sim ? ' <span class="nota">· simulated</span>' : ""}`; $("#cuacaR").textContent = c.jam ? `🌧 Rain ${c.jam.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · ${c.prob}%` : `☀ No heavy rain forecast · max ${c.prob}%`;
   kemasSemua();
 }
 function jamHujan() { const c = S.cuaca; if (!c || !c.jam) return null; return (c.jam.getTime() - Date.now()) / 3600e3; }
@@ -2032,96 +2074,165 @@ $("#notif").addEventListener("click", e => { const b = e.target.closest("[data-n
 $("#notifBaca").onclick = () => { senaraiNotif().forEach(n => S.ack.add(n.k)); paparNotif(); audit("Critical notifications marked as read"); };
 setInterval(() => { if (S.masuk) ambilCuaca(); }, 30 * 60e3);
 
-/* =================== MASKOT "SCANNY" (login) =================== */
-const MS = { fasa: "jalan", t0: 0, x: 0, lubang: [], pop: [], tengok: 0, ping: 0, jarak: 0, akan: 1.2, w: 0, h: 170, ctx: null, kira: 0 };
-function saizMaskot() { const c = $("#lgMaskot"); if (!c) return; const r = c.getBoundingClientRect(); if (!r.width) return; const d = Math.min(devicePixelRatio || 1, 2); MS.w = r.width; c.width = Math.round(r.width * d); c.height = Math.round(MS.h * d); MS.ctx = c.getContext("2d"); MS.ctx.setTransform(d, 0, 0, d, 0, 0); }
+/* =================== HUD SENSOR (login) =================== */
+const MS = { fasa: "jalan", t0: 0, tengok: 0, ping: 0, jarak: 0, akan: .8, w: 0, h: 190, ctx: null, kira: 0, obj: [], paket: [], titik: [] };
+function saizMaskot() { const c = $("#lgMaskot"); if (!c) return; const r = c.getBoundingClientRect(); if (!r.width) return; const d = Math.min(devicePixelRatio || 1, 2); MS.w = r.width; c.width = Math.round(r.width * d); c.height = Math.round(MS.h * d); MS.ctx = c.getContext("2d"); MS.ctx.setTransform(d, 0, 0, d, 0, 0); MS.titik = Array.from({ length: 140 }, () => [Math.random() * r.width, Math.random(), Math.random()]); }
 addEventListener("resize", saizMaskot);
-const KATA = ["Hi! I'm Scanny 👋", "I scan roads for potholes 🔍", "Every find gets a GPS pin 📍", "Reports go straight to JKR 🏛", "Enter your PIN to start 🔐"];
-let kataI = 0, kataT = 0;
-function cakapMaskot(t) { const g = $("#gelembung"); if (!g) return; g.textContent = t; g.classList.remove("tukar"); void g.offsetWidth; g.classList.add("tukar"); kataT = performance.now(); }
+const STATUS_HUD = ["SCANNING ROAD SURFACE · YOLOv8-S RDD · 30 FPS", "DEPTH SENSOR ONLINE · ±2 mm", "GNSS LOCK · 9 SATELLITES · HDOP 0.9", "UPLINK TO JKR PORTAL · 4G · 38 ms", "AWAITING OPERATOR AUTHENTICATION"];
+let hudI = 0, hudT = 0;
+function cakapMaskot(t, kelas) { const g = $("#gelembung"); if (!g) return; g.textContent = t; g.className = "hudStatus" + (kelas ? " " + kelas : ""); hudT = performance.now(); }
 function kiraNaik(el) { if (!el) return; const ke = parseInt(el.textContent) || 0, t0 = performance.now(); (function f() { const k = Math.min(1, (performance.now() - t0) / 1100), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(ke * e); if (k < 1) requestAnimationFrame(f); else el.textContent = ke; })(); }
+const KELAS_HUD = [["POTHOLE", "D40"], ["ALLIGATOR CRACK", "D20"], ["LONG. CRACK", "D00"], ["TRANS. CRACK", "D10"]];
 function lukisMaskot(dt, now) {
-  const x = MS.ctx; if (!x || !MS.w) { saizMaskot(); return; } const w = MS.w, h = MS.h, rY = 128;
+  const x = MS.ctx; if (!x || !MS.w) { saizMaskot(); return; } const w = MS.w, h = MS.h, rT = 58, rB = 168, rM = (rT + rB) / 2;
   x.clearRect(0, 0, w, h);
-  if (now - kataT > 3600 && MS.fasa === "jalan" && !LG.pin.length) { kataI = (kataI + 1) % KATA.length; cakapMaskot(KATA[kataI]); }
-  const lulus = MS.fasa === "lulus", gagal = MS.fasa === "gagal" && now - MS.t0 < 900;
-  if (MS.fasa === "gagal" && !gagal) MS.fasa = "jalan";
-  const laju = lulus ? 260 + (now - MS.t0) * .9 : 120; MS.jarak += laju * dt;
-  // jalan
-  const g1 = x.createLinearGradient(0, rY - 16, 0, rY + 22); g1.addColorStop(0, "rgba(40,48,62,.95)"); g1.addColorStop(1, "rgba(22,27,36,.95)");
-  x.fillStyle = g1; x.beginPath(); x.roundRect ? x.roundRect(0, rY - 16, w, 38, 10) : x.rect(0, rY - 16, w, 38); x.fill();
-  x.fillStyle = "rgba(255,214,90,.85)"; for (let d = -(MS.jarak % 60); d < w; d += 60) x.fillRect(d, rY + 2, 30, 3);
-  x.strokeStyle = "rgba(255,255,255,.35)"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, rY - 14); x.lineTo(w, rY - 14); x.moveTo(0, rY + 20); x.lineTo(w, rY + 20); x.stroke();
-  // kedudukan kereta
-  const cxBase = Math.max(110, w * .3); let cx = cxBase;
-  if (lulus) cx = cxBase + Math.pow((now - MS.t0) / 1000, 2) * 900; if (gagal) cx += Math.sin((now - MS.t0) / 28) * 6;
-  const bob = Math.sin(now / 90) * 1.3, cy = rY - 30 + bob;
-  $("#gelembung") && $("#gelembung").style.setProperty("--gx", Math.min(w - 90, Math.max(90, cx + 20)) + "px");
-  // lubang
-  MS.akan -= dt; if (MS.akan <= 0 && !lulus) { MS.lubang.push({ x: w + 40, r: 10 + Math.random() * 10, jumpa: false }); MS.akan = 1.4 + Math.random() * 1.8; }
-  MS.lubang.forEach(L => { L.x -= laju * dt; });
-  MS.lubang = MS.lubang.filter(L => L.x > -60);
-  const bA = cx + 50, bB = cx + 150;
-  MS.lubang.forEach(L => {
-    x.fillStyle = "#07090c"; x.beginPath(); x.ellipse(L.x, rY + 6, L.r, L.r * .32, 0, 0, 7); x.fill(); x.strokeStyle = "rgba(160,160,150,.4)"; x.lineWidth = 1.2; x.stroke();
-    if (!L.jumpa && L.x > bA && L.x < bB) { L.jumpa = true; MS.kira++; MS.pop.push({ L, t: now }); bip(1500, 50, .02); }
-    if (L.jumpa) { x.strokeStyle = "#FFA21F"; x.lineWidth = 2; x.beginPath(); x.ellipse(L.x, rY + 6, L.r + 4, L.r * .32 + 3, 0, 0, 7); x.stroke(); }
+  if (now - hudT > 3200 && MS.fasa === "jalan" && !LG.pin.length) { hudI = (hudI + 1) % STATUS_HUD.length; cakapMaskot(STATUS_HUD[hudI]); }
+  const lulus = MS.fasa === "lulus", gagal = MS.fasa === "gagal" && now - MS.t0 < 700; if (MS.fasa === "gagal" && !gagal) { MS.fasa = "jalan"; }
+  const laju = lulus ? 300 + (now - MS.t0) * 1.4 : 95; MS.jarak += laju * dt;
+  const aksen = lulus ? "242,193,78" : gagal ? "255,59,78" : "90,169,255";
+  // grid latar
+  x.strokeStyle = "rgba(120,170,255,.07)"; x.lineWidth = 1; for (let gx = -(MS.jarak * .3 % 24); gx < w; gx += 24) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, h); x.stroke(); } for (let gy = 6; gy < h; gy += 24) { x.beginPath(); x.moveTo(0, gy); x.lineTo(w, gy); x.stroke(); }
+  // jalan (pandangan atas)
+  const gj = x.createLinearGradient(0, rT, 0, rB); gj.addColorStop(0, "rgba(24,30,42,.92)"); gj.addColorStop(.5, "rgba(34,40,54,.92)"); gj.addColorStop(1, "rgba(24,30,42,.92)"); x.fillStyle = gj; x.fillRect(0, rT, w, rB - rT);
+  MS.titik.forEach(t => { const tx = ((t[0] - MS.jarak) % w + w) % w, ty = rT + 4 + t[1] * (rB - rT - 8); x.fillStyle = `rgba(${aksen},${.12 + t[2] * .25})`; x.fillRect(tx, ty, 1.4, 1.4); });
+  x.strokeStyle = "rgba(235,240,250,.75)"; x.lineWidth = 2; x.beginPath(); x.moveTo(0, rT + 3); x.lineTo(w, rT + 3); x.moveTo(0, rB - 3); x.lineTo(w, rB - 3); x.stroke();
+  x.fillStyle = "rgba(255,214,90,.85)"; for (let d = -(MS.jarak % 70); d < w; d += 70) x.fillRect(d, rM - 1.5, 36, 3);
+  // objek (lubang & retak)
+  MS.akan -= dt; if (MS.akan <= 0 && !lulus) { const k = KELAS_HUD[Math.floor(Math.random() * 4)], t = Math.random(), sev = t < .2 ? "H" : t < .6 ? "M" : "L"; const lane = Math.random() < .5 ? rT + 22 + Math.random() * 18 : rM + 14 + Math.random() * 18;
+    const o = { x: w + 60, y: lane, k, sev, r: 9 + Math.random() * 9, conf: (.86 + Math.random() * .13).toFixed(2), d: sev === "H" ? 52 + Math.random() * 30 | 0 : sev === "M" ? 26 + Math.random() * 22 | 0 : 8 + Math.random() * 14 | 0, pts: [], jumpa: 0 };
+    if (k[1] !== "D40") { let px2 = 0, py = 0; const pj = k[1] === "D10" ? 1 : 0; for (let i = 0; i < 9; i++) { o.pts.push([px2, py]); if (pj) { py += 3 + Math.random() * 2; px2 += (Math.random() - .5) * 4; } else { px2 += 4 + Math.random() * 3; py += (Math.random() - .5) * 5; } } }
+    MS.obj.push(o); MS.akan = 1.1 + Math.random() * 1.4; }
+  MS.obj.forEach(o => o.x -= laju * dt); MS.obj = MS.obj.filter(o => o.x > -140);
+  const cx = Math.max(120, w * .26) + (lulus ? Math.pow((now - MS.t0) / 1000, 2) * 1100 : 0) + (gagal ? Math.sin((now - MS.t0) / 22) * 4 : 0), cy = rM + 22;
+  const fA = cx + 44, fB = Math.min(w - 20, cx + 300);
+  MS.obj.forEach(o => {
+    x.save(); x.translate(o.x, o.y);
+    if (o.k[1] === "D40") { const g2 = x.createRadialGradient(0, 0, 1, 0, 0, o.r); g2.addColorStop(0, "#030405"); g2.addColorStop(.75, "#0b0d10"); g2.addColorStop(1, "rgba(80,84,90,.9)"); x.fillStyle = g2; x.beginPath(); for (let i = 0; i <= 12; i++) { const a = i / 12 * 6.283, rr = o.r * (.85 + .15 * Math.sin(i * 2.7 + o.r)); i ? x.lineTo(Math.cos(a) * rr, Math.sin(a) * rr * .7) : x.moveTo(rr, 0); } x.fill(); }
+    else if (o.k[1] === "D20") { x.strokeStyle = "#07080a"; x.lineWidth = 1.2; for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { x.strokeRect(i * 7 - 14 + (j % 2) * 3, j * 6 - 9, 7, 6); } }
+    else { x.strokeStyle = "#07080a"; x.lineWidth = 1.6; x.beginPath(); o.pts.forEach((p, i) => i ? x.lineTo(p[0] - 16, p[1] - 12) : x.moveTo(p[0] - 16, p[1] - 12)); x.stroke(); }
+    x.restore();
+    if (!o.jumpa && o.x > fA + 20 && o.x < fB && !lulus) { o.jumpa = now; MS.kira++; MS.paket.push({ x0: o.x, y0: o.y - 20, t: now }); }
+    if (o.jumpa) {
+      const k2 = Math.min(1, (now - o.jumpa) / 260), warna = o.sev === "H" ? "255,59,78" : o.sev === "M" ? "255,162,31" : "54,214,122", bx = 24 + 6 * (1 - k2), by = 18 + 6 * (1 - k2), c3 = 7;
+      x.strokeStyle = `rgba(${warna},${k2})`; x.lineWidth = 1.8; x.beginPath();
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => { const px3 = o.x + sx * bx, py3 = o.y + sy * by; x.moveTo(px3 - sx * -c3 * -1 + (sx > 0 ? -c3 : c3), py3); x.lineTo(px3, py3); x.lineTo(px3, py3 + (sy > 0 ? -c3 : c3)); }); x.stroke();
+      if (k2 >= 1) { const lab = `${o.k[0]} ${o.conf}`, sub = o.k[1] === "D40" ? `${o.d} mm deep` : `${Math.max(2, o.d / 3 | 0)} mm wide`; x.font = "700 10px 'JetBrains Mono',monospace"; const tw = Math.max(x.measureText(lab).width, x.measureText(sub).width) + 12, ly = o.y - by - 30;
+        x.fillStyle = `rgba(${warna},.92)`; x.fillRect(o.x - bx, ly, tw, 13); x.fillStyle = "#08101c"; x.fillText(lab, o.x - bx + 6, ly + 10);
+        x.fillStyle = "rgba(8,16,28,.85)"; x.fillRect(o.x - bx, ly + 13, tw, 13); x.fillStyle = `rgb(${warna})`; x.font = "600 9.5px 'JetBrains Mono',monospace"; x.fillText(sub, o.x - bx + 6, ly + 23); }
+    }
   });
-  // pin GPS melompat
-  MS.pop = MS.pop.filter(p => p.L.x > -40);
-  MS.pop.forEach(p => {
-    const k = Math.min(1, (now - p.t) / 450), s = k < 1 ? 1 + Math.sin(k * Math.PI) * .45 : 1, px2 = p.L.x, py = rY - 8 - 26 * Math.min(1, k * 1.4);
-    x.save(); x.translate(px2, py); x.scale(s, s); x.fillStyle = "#FF5A5F"; x.strokeStyle = "#fff"; x.lineWidth = 1.6; x.beginPath(); x.moveTo(0, 12); x.bezierCurveTo(-10, -1, -9, -14, 0, -14); x.bezierCurveTo(9, -14, 10, -1, 0, 12); x.fill(); x.stroke(); x.fillStyle = "#fff"; x.beginPath(); x.arc(0, -5, 3.5, 0, 7); x.fill(); x.restore();
-    const ft = (now - p.t) / 1000; if (ft < 1.2) { x.globalAlpha = 1 - ft / 1.2; x.fillStyle = "#36D67A"; x.font = "700 12px 'JetBrains Mono',monospace"; x.fillText("+1 report", px2 + 10, py - 18 - ft * 20); x.globalAlpha = 1; }
-  });
-  // sinar imbasan
-  if (!lulus) { const sg = x.createLinearGradient(cx + 40, 0, bB, 0); sg.addColorStop(0, "rgba(242,193,78,.45)"); sg.addColorStop(1, "rgba(90,169,255,.04)"); x.fillStyle = sg; x.beginPath(); x.moveTo(cx + 44, cy + 14); x.lineTo(bB, rY - 8); x.lineTo(bB, rY + 18); x.lineTo(bA, rY + 18); x.closePath(); x.fill();
-    const sl = bA + ((now / 6) % (bB - bA)); x.strokeStyle = "rgba(255,226,154,.8)"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(sl, rY - 6); x.lineTo(sl, rY + 18); x.stroke(); }
-  // garis laju
-  if (lulus) { x.strokeStyle = "rgba(255,255,255,.5)"; x.lineWidth = 2; for (let i = 0; i < 7; i++) { const yy = cy - 10 + i * 7, ll = 30 + (i * 37 % 50); x.beginPath(); x.moveTo(cx - 60 - ll - (i * 13 % 30), yy); x.lineTo(cx - 55, yy); x.stroke(); } }
-  // kereta
+  // kipas pengesanan
+  if (!lulus) { const gf = x.createLinearGradient(fA, 0, fB, 0); gf.addColorStop(0, `rgba(${aksen},.28)`); gf.addColorStop(1, `rgba(${aksen},0)`); x.fillStyle = gf; x.beginPath(); x.moveTo(fA, cy - 6); x.lineTo(fB, rT + 4); x.lineTo(fB, rB - 4); x.closePath(); x.fill();
+    const sw = fA + ((now / 4) % (fB - fA)), yt = cy - 6 + (rT + 4 - cy + 6) * (sw - fA) / (fB - fA), yb = cy - 6 + (rB - 4 - cy + 6) * (sw - fA) / (fB - fA); x.strokeStyle = `rgba(${aksen},.85)`; x.lineWidth = 1.5; x.beginPath(); x.moveTo(sw, yt); x.lineTo(sw, yb); x.stroke(); }
+  // cincin LiDAR
+  for (let i = 0; i < 3; i++) { const k3 = ((now / 1600) + i / 3) % 1; x.strokeStyle = `rgba(${aksen},${(1 - k3) * .5})`; x.lineWidth = 1.4; x.beginPath(); x.ellipse(cx, cy, 30 + k3 * 110, (30 + k3 * 110) * .45, 0, 0, 7); x.stroke(); }
+  const pk = (now - MS.ping) / 500; if (pk < 1) { x.strokeStyle = `rgba(242,193,78,${1 - pk})`; x.lineWidth = 2.5; x.beginPath(); x.ellipse(cx, cy, 34 + pk * 70, (34 + pk * 70) * .45, 0, 0, 7); x.stroke(); }
+  // jejak cahaya (lulus)
+  if (lulus) { for (let i = 0; i < 2; i++) { const yy = cy + (i ? 9 : -9), g4 = x.createLinearGradient(cx - 260, 0, cx - 30, 0); g4.addColorStop(0, "rgba(242,193,78,0)"); g4.addColorStop(1, "rgba(255,226,154,.9)"); x.strokeStyle = g4; x.lineWidth = 3; x.beginPath(); x.moveTo(cx - 260, yy); x.lineTo(cx - 30, yy); x.stroke(); } }
+  // kenderaan (pandangan atas)
   x.save(); x.translate(cx, cy);
-  x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.ellipse(0, 30 - bob, 46, 6, 0, 0, 7); x.fill();
-  const gb = x.createLinearGradient(0, -22, 0, 22); gb.addColorStop(0, "#7cc0ff"); gb.addColorStop(1, "#2a6fd6");
-  x.fillStyle = gb; x.beginPath(); x.roundRect ? x.roundRect(-44, -18, 90, 40, 16) : x.rect(-44, -18, 90, 40); x.fill();
-  x.fillStyle = "#F2C14E"; x.beginPath(); x.roundRect ? x.roundRect(-44, 8, 90, 7, 3) : x.rect(-44, 8, 90, 7); x.fill();
-  // kubah sensor & antena
-  x.fillStyle = "#F2C14E"; x.beginPath(); x.ellipse(-8, -18, 14, 9, 0, Math.PI, 0); x.fill();
-  x.strokeStyle = "#cfd8e8"; x.lineWidth = 2; x.beginPath(); x.moveTo(-24, -18); x.lineTo(-30, -36); x.stroke();
-  const pk = (now - MS.ping) / 600; x.fillStyle = Math.sin(now / 200) > 0 ? "#FF5A5F" : "#ffd0d2"; x.beginPath(); x.arc(-30, -37, 3.5, 0, 7); x.fill();
-  if (pk < 1) { x.strokeStyle = `rgba(90,169,255,${1 - pk})`; x.lineWidth = 2; x.beginPath(); x.arc(-30, -37, 4 + pk * 22, 0, 7); x.stroke(); }
-  // cermin depan dengan mata
-  x.fillStyle = "#0e1a33"; x.beginPath(); x.roundRect ? x.roundRect(4, -12, 36, 20, 8) : x.rect(4, -12, 36, 20); x.fill();
-  const kelip = (now % 3400) < 130, gembira = lulus, sedih = gagal, tg = MS.tengok; MS.tengok = Math.max(0, MS.tengok - dt * .8);
-  [[14, -2], [30, -2]].forEach(([ex, ey]) => {
-    if (gembira) { x.strokeStyle = "#fff"; x.lineWidth = 2.6; x.beginPath(); x.arc(ex, ey + 2, 5, Math.PI * 1.1, Math.PI * 1.9); x.stroke(); return; }
-    if (sedih) { x.strokeStyle = "#ff8a95"; x.lineWidth = 2.4; x.beginPath(); x.moveTo(ex - 4, ey - 3); x.lineTo(ex + 4, ey + 3); x.moveTo(ex + 4, ey - 3); x.lineTo(ex - 4, ey + 3); x.stroke(); return; }
-    if (kelip) { x.strokeStyle = "#fff"; x.lineWidth = 2.4; x.beginPath(); x.moveTo(ex - 5, ey); x.lineTo(ex + 5, ey); x.stroke(); return; }
-    x.fillStyle = "#fff"; x.beginPath(); x.ellipse(ex, ey, 6, 6.5, 0, 0, 7); x.fill();
-    x.fillStyle = "#14203a"; x.beginPath(); x.arc(ex + 1.5 + tg * 1.5, ey + .5 - tg * 2.5, 3.2, 0, 7); x.fill();
-    x.fillStyle = "#fff"; x.beginPath(); x.arc(ex + 2.6 + tg * 1.5, ey - 1 - tg * 2.5, 1.1, 0, 7); x.fill();
-  });
-  // pipi & senyum
-  x.fillStyle = "rgba(255,120,140,.55)"; x.beginPath(); x.arc(8, 8, 3, 0, 7); x.arc(37, 8, 3, 0, 7); x.fill();
-  x.strokeStyle = sedih ? "#ff8a95" : "#fff"; x.lineWidth = 2; x.beginPath(); sedih ? x.arc(22, 9, 4, Math.PI * 1.15, Math.PI * 1.85) : x.arc(22, 3, 4, Math.PI * .15, Math.PI * .85); x.stroke();
-  // lampu
-  x.fillStyle = "#FFE19A"; x.beginPath(); x.arc(44, 4, 3, 0, 7); x.fill();
-  x.fillStyle = "rgba(255,90,95,.9)"; x.beginPath(); x.arc(-43, 2, 2.5, 0, 7); x.fill();
-  // tayar
-  [[-26, 22], [26, 22]].forEach(([wx, wy]) => { x.fillStyle = "#141820"; x.beginPath(); x.arc(wx, wy, 10, 0, 7); x.fill(); x.fillStyle = "#9aa6bd"; x.beginPath(); x.arc(wx, wy, 4.5, 0, 7); x.fill(); const a = MS.jarak / 10; x.strokeStyle = "#141820"; x.lineWidth = 2; x.beginPath(); for (let k = 0; k < 3; k++) { const aa = a + k * 2.09; x.moveTo(wx, wy); x.lineTo(wx + Math.cos(aa) * 4.5, wy + Math.sin(aa) * 4.5); } x.stroke(); });
-  x.font = "700 7.5px 'JetBrains Mono',monospace"; x.fillStyle = "#0e1a33"; x.fillText("RS-08", -36, 14.5);
+  x.fillStyle = "rgba(0,0,0,.45)"; x.beginPath(); x.roundRect ? x.roundRect(-38, -16, 80, 36, 10) : x.rect(-38, -16, 80, 36); x.fill();
+  const gb = x.createLinearGradient(0, -18, 0, 18); gb.addColorStop(0, "#e8eef8"); gb.addColorStop(.5, "#b9c6da"); gb.addColorStop(1, "#8e9db6"); x.fillStyle = gb; x.beginPath(); x.roundRect ? x.roundRect(-40, -18, 80, 36, 11) : x.rect(-40, -18, 80, 36); x.fill();
+  x.fillStyle = "#1b2a44"; x.beginPath(); x.moveTo(12, -14); x.lineTo(24, -12); x.lineTo(24, 12); x.lineTo(12, 14); x.closePath(); x.fill();
+  x.beginPath(); x.moveTo(-26, -13); x.lineTo(-18, -14); x.lineTo(-18, 14); x.lineTo(-26, 13); x.closePath(); x.fill();
+  x.fillStyle = "#d4dcea"; x.fillRect(-16, -14, 26, 28);
+  x.fillStyle = "#F2C14E"; x.beginPath(); x.arc(-3, 0, 6, 0, 7); x.fill(); x.fillStyle = "#1b2a44"; x.beginPath(); x.arc(-3, 0, 2.5, 0, 7); x.fill();
+  const sapu = now / 300; x.strokeStyle = "rgba(242,193,78,.9)"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(-3, 0); x.lineTo(-3 + Math.cos(sapu) * 9, Math.sin(sapu) * 9); x.stroke();
+  x.fillStyle = "#9fb0ca"; x.fillRect(10, -21, 5, 4); x.fillRect(10, 17, 5, 4);
+  x.fillStyle = "#FFF4CC"; x.fillRect(37, -14, 3, 7); x.fillRect(37, 7, 3, 7); x.fillStyle = "rgba(255,70,80,.95)"; x.fillRect(-40, -14, 2.5, 6); x.fillRect(-40, 8, 2.5, 6);
+  x.font = "700 7px 'JetBrains Mono',monospace"; x.fillStyle = "#1b2a44"; x.fillText("RS-08", -36, 3);
   x.restore();
-  // kiraan
-  x.font = "600 11px 'JetBrains Mono',monospace"; x.fillStyle = "rgba(190,200,225,.75)"; x.textAlign = "right"; x.fillText(`potholes tagged: ${MS.kira}`, w - 6, 16); x.textAlign = "left";
+  // paket data ke JKR
+  const jx = w - 46, jy = 26;
+  MS.paket = MS.paket.filter(p => now - p.t < 1300);
+  MS.paket.forEach(p => { const k4 = Math.min(1, (now - p.t) / 1100), e = k4 * k4 * (3 - 2 * k4), px4 = p.x0 + (jx - p.x0) * e, py4 = p.y0 + (jy - p.y0) * e - Math.sin(e * Math.PI) * 30;
+    x.strokeStyle = "rgba(90,169,255,.35)"; x.setLineDash([3, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(p.x0, p.y0); x.quadraticCurveTo((p.x0 + jx) / 2, Math.min(p.y0, jy) - 30, jx, jy); x.stroke(); x.setLineDash([]);
+    x.fillStyle = "#74B8FF"; x.shadowColor = "#74B8FF"; x.shadowBlur = 10; x.beginPath(); x.arc(px4, py4, 3.5, 0, 7); x.fill(); x.shadowBlur = 0; if (k4 >= 1 && !p.sampai) { p.sampai = 1; MS.nodeT = now; } });
+  const nk = MS.nodeT ? (now - MS.nodeT) / 600 : 2;
+  x.strokeStyle = nk < 1 ? `rgba(54,214,122,${1 - nk})` : "rgba(242,193,78,.6)"; x.lineWidth = 1.5; x.beginPath(); x.arc(jx, jy, 15 + (nk < 1 ? nk * 10 : 0), 0, 7); x.stroke();
+  x.fillStyle = "rgba(15,35,80,.95)"; x.beginPath(); x.arc(jx, jy, 14, 0, 7); x.fill(); x.fillStyle = "#FFE19A"; x.font = "700 9px 'JetBrains Mono',monospace"; x.textAlign = "center"; x.fillText("JKR", jx, jy + 3);
+  // telemetri
+  const v = kedudukan(B3.sLogin || 0); x.textAlign = "left"; x.font = "600 10px 'JetBrains Mono',monospace"; x.fillStyle = "rgba(195,205,230,.75)";
+  x.fillText("SENSOR FUSION · CAM + DEPTH + GNSS", 0, 14); x.fillText(`LAT ${v.lat.toFixed(5)}  LON ${v.lon.toFixed(5)}  ·  ${lulus ? "ARMED" : (laju * 3.6 / 10 | 0) + " km/h"}`, 0, 30);
+  x.textAlign = "right"; x.fillText(`REPORTS SENT ${MS.kira}`, jx - 24, 30); x.textAlign = "left";
+  if (gagal) { x.fillStyle = "rgba(255,59,78,.10)"; x.fillRect(0, 0, w, h); for (let i = 0; i < 4; i++) { const yy = Math.random() * h; x.drawImage(x.canvas, 0, yy * (x.canvas.height / h), x.canvas.width, 6 * (x.canvas.height / h), (Math.random() - .5) * 16, yy, w, 6); } }
+}
+
+/* =================== PETA KERJA (Mission Centre) =================== */
+function buatPeta(sel) { const el = $(sel); return { el, lay: el.querySelector(".lmTiles"), c: el.querySelector("canvas"), z: 17, lat: PUO[0], lon: PUO[1], img: new Map(), ok: 0, err: 0, gagal: false, w: 0, h: 0, pin: [], ikut: true }; }
+function mSaiz(M) { const r = M.el.getBoundingClientRect(); if (!r.width) return false; M.w = r.width; M.h = r.height; M.c.width = Math.round(r.width * DPR); M.c.height = Math.round(r.height * DPR); M.c.getContext("2d").setTransform(DPR, 0, 0, DPR, 0, 0); return true; }
+function mKe(M, lat, lon) { const [cx, cy] = px(M.lat, M.lon, M.z), [x, y] = px(lat, lon, M.z); return [x - cx + M.w / 2, y - cy + M.h / 2]; }
+function mTiles(M) {
+  if (!M.w || M.gagal) return; const [cx, cy] = px(M.lat, M.lon, M.z), n = 2 ** M.z, perlu = new Set();
+  for (let tx = Math.floor((cx - M.w / 2) / 256); tx <= Math.floor((cx + M.w / 2) / 256); tx++) for (let ty = Math.floor((cy - M.h / 2) / 256); ty <= Math.floor((cy + M.h / 2) / 256); ty++) {
+    if (ty < 0 || ty >= n) continue; const xx = ((tx % n) + n) % n, k = M.z + "/" + xx + "/" + ty; perlu.add(k); let im = M.img.get(k);
+    if (!im) { im = new Image(); im.alt = ""; im.draggable = false; im.className = "lmT"; im.onload = () => { M.ok++; im.classList.add("ok"); }; im.onerror = () => { M.err++; if (M.err >= 3 && !M.ok) mGagal(M); }; im.src = `https://tile.openstreetmap.org/${M.z}/${xx}/${ty}.png`; M.img.set(k, im); M.lay.appendChild(im); }
+    im.style.transform = `translate(${Math.round(tx * 256 - cx + M.w / 2)}px,${Math.round(ty * 256 - cy + M.h / 2)}px)`;
+  }
+  M.img.forEach((im, k) => { if (!perlu.has(k)) { im.remove(); M.img.delete(k); } });
+  if (!M.ok && !M.semak) M.semak = setTimeout(() => { if (!M.ok) mGagal(M); }, 6000);
+}
+function mGagal(M) { if (M.gagal) return; M.gagal = true; M.img.forEach(im => im.remove()); M.img.clear(); M.el.classList.add("tanpaJubin"); const n = document.createElement("a"); n.className = "mpNota"; n.href = "https://iotbookridzuan.github.io/cv_demo/roadscan/"; n.target = "_blank"; n.rel = "noopener"; n.textContent = "Street map loads in the hosted version ↗"; M.el.appendChild(n); }
+function mLukis(M) {
+  const x = M.c.getContext("2d"), w = M.w, h = M.h; if (!w) return; x.clearRect(0, 0, w, h); const SG = SIANG(), mpp = 156543.03 * Math.cos(M.lat * Math.PI / 180) / 2 ** M.z;
+  if (M.gagal) { x.strokeStyle = "rgba(120,180,255,.13)"; x.lineWidth = 1; const g = 256 / 4, [cx, cy] = px(M.lat, M.lon, M.z); for (let gx = -((cx - w / 2) % g); gx < w; gx += g) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, h); x.stroke(); } for (let gy = -((cy - h / 2) % g); gy < h; gy += g) { x.beginPath(); x.moveTo(0, gy); x.lineTo(w, gy); x.stroke(); } }
+  const garis = (pts, warna, lb, putus) => { if (pts.length < 2) return; x.save(); x.strokeStyle = warna; x.lineWidth = lb; x.lineJoin = x.lineCap = "round"; if (putus) x.setLineDash(putus); x.beginPath(); pts.forEach((p, i) => { const [a, b] = mKe(M, p[0], p[1]); i ? x.lineTo(a, b) : x.moveTo(a, b); }); x.stroke(); x.restore(); };
+  if (!S.gpsLive) { const ll = wpLL(); garis(ll, "rgba(90,169,255,.3)", 11); garis(ll, "#3d8fe6", 4); }
+  const v = kedudukan(S.s);
+  if (PJ.baiki.length) garis([[v.lat, v.lon], ...PJ.baiki.map(L => [L.lat, L.lon])], "rgba(242,193,78,.95)", 3, [9, 7]);
+  const dp = depan(); M.pin = []; const now = performance.now();
+  aktif().slice().reverse().forEach(L => { const [sx, sy] = mKe(M, L.lat, L.lon); if (sx < -20 || sy < -20 || sx > w + 20 || sy > h + 20) return; const c2 = L.status === 4 ? "#8A93A8" : WARNA[L.ukur.tahap], r = L.kod === "D40" ? 8 : 6;
+    if ((L.ukur.tahap === "H" && L.status < 4) || (dp && dp[0] === L)) { const k = (now / 1100) % 1; x.strokeStyle = dp && dp[0] === L ? "#F2C14E" : c2; x.globalAlpha = 1 - k; x.lineWidth = 2; x.beginPath(); x.arc(sx, sy, r + k * 20, 0, 7); x.stroke(); x.globalAlpha = 1; }
+    x.fillStyle = c2; x.beginPath(); x.arc(sx, sy, r, 0, 7); x.fill(); x.strokeStyle = "#fff"; x.lineWidth = 2; x.stroke(); M.pin.push({ id: L.id, x: sx, y: sy }); });
+  const [vx, vy] = mKe(M, v.lat, v.lon);
+  x.fillStyle = "rgba(90,169,255,.2)"; x.beginPath(); x.arc(vx, vy, Math.max(12, 10 / mpp), 0, 7); x.fill();
+  x.save(); x.translate(vx, vy); x.rotate(v.hdg); x.fillStyle = "#3d8fe6"; x.strokeStyle = "#fff"; x.lineWidth = 2.5; x.shadowColor = "rgba(0,0,0,.45)"; x.shadowBlur = 8; x.beginPath(); x.moveTo(0, -15); x.lineTo(10, 11); x.lineTo(0, 6); x.lineTo(-10, 11); x.closePath(); x.fill(); x.stroke(); x.restore();
+  const m = [20, 50, 100, 200, 500, 1000].find(q => q / mpp > 60) || 1000, lb = m / mpp; x.strokeStyle = !M.gagal && SG ? "#0E1430" : "#EEF1FA"; x.lineWidth = 2; x.beginPath(); x.moveTo(w - 16 - lb, h - 30); x.lineTo(w - 16, h - 30); x.stroke(); x.fillStyle = x.strokeStyle; x.font = "600 10px 'JetBrains Mono',monospace"; x.textAlign = "right"; x.fillText(m >= 1000 ? m / 1000 + " km" : m + " m", w - 16, h - 35); x.textAlign = "left";
+}
+function mDetik(M) { if (M.ikut) { const v = kedudukan(S.s); M.lat = v.lat; M.lon = v.lon; mTiles(M); } mLukis(M); kemasNav(); }
+const MP = buatPeta("#mpPeta");
+(() => { const el = MP.el; let m0 = null;
+  el.addEventListener("pointerdown", e => { if (e.target.closest(".mpCtl,.mpNav,.lmAttr,a,button")) return; const [cx, cy] = px(MP.lat, MP.lon, MP.z); m0 = { x: e.clientX, y: e.clientY, cx, cy, g: 0 }; el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => { if (!m0) return; const dx = e.clientX - m0.x, dy = e.clientY - m0.y; m0.g = Math.max(m0.g, Math.hypot(dx, dy)); if (m0.g > 4) { MP.ikut = false; $("#mpIkut").classList.remove("on"); [MP.lat, MP.lon] = unpx(m0.cx - dx, m0.cy - dy, MP.z); mTiles(MP); mLukis(MP); } });
+  el.addEventListener("pointerup", e => { if (!m0) return; const g = m0.g; m0 = null; if (g > 4) return; const r = el.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top; let best = null, bd = 18; MP.pin.forEach(p => { const d = Math.hypot(p.x - sx, p.y - sy); if (d < bd) { bd = d; best = p; } }); if (best) bukaModal(best.id); });
+  el.addEventListener("wheel", e => { e.preventDefault(); MP.z = Math.max(5, Math.min(19, MP.z + (e.deltaY < 0 ? 1 : -1))); mTiles(MP); mLukis(MP); }, { passive: false });
+  $("#mpPlus").onclick = () => { MP.z = Math.min(19, MP.z + 1); mTiles(MP); mLukis(MP); };
+  $("#mpMinus").onclick = () => { MP.z = Math.max(5, MP.z - 1); mTiles(MP); mLukis(MP); };
+  $("#mpIkut").onclick = () => { MP.ikut = true; $("#mpIkut").classList.add("on"); mDetik(MP); };
+  $("#mpBesar").onclick = () => { pergi("live"); };
+  addEventListener("resize", () => { if (S.hlm === "misi" && S.tg === "peta" && mSaiz(MP)) { mTiles(MP); mLukis(MP); } });
+})();
+// kerosakan seterusnya di hadapan
+function depan() {
+  const buka = aktif().filter(L => L.status < 4); if (!buka.length) return null; const v = kedudukan(S.s);
+  if (!S.gpsLive) { const s0 = ((S.s % PANJANG) + PANJANG) % PANJANG; let best = null, bd = 1e12; buka.forEach(L => { if (L.import) return; const d = ((L.sRoute - s0) % PANJANG + PANJANG) % PANJANG; if (d > 3 && d < bd) { bd = d; best = L; } }); if (best) return [best, bd]; }
+  return buka.map(L => [L, jarakM([v.lat, v.lon], [L.lat, L.lon])]).sort((a, b) => a[1] - b[1])[0];
+}
+const jarakTeks = d => d < 1000 ? Math.round(d / 10) * 10 + " m" : (d / 1000).toFixed(1) + " km";
+const NASIHAT = { H: "Slow down · hazard ahead", M: "Caution · uneven surface", L: "Minor defect · monitor" };
+function kemasNav() {
+  const dp = depan(), nav = $("#mpNav"), lj = $("#mpLaju"); lj.querySelector("b").textContent = S.mod === "sim" && !S.jeda ? S.laju : 0;
+  if (!dp) { nav.className = "mpNav ok"; nav.innerHTML = `<span class="ar">✓</span><div><b>Road clear</b><small>No open defects ahead</small></div>`; return; }
+  const [L, d] = dp; nav.className = "mpNav " + L.ukur.tahap;
+  nav.innerHTML = `<span class="ar">▲</span><div><b>${jarakTeks(d)} · ${L.jenis}</b><small>${TAHAP[L.ukur.tahap]} · ${saizTeks(L)} · ${NASIHAT[L.ukur.tahap]}</small></div>`;
+}
+function paparDepan() {
+  const el = $("#depanKad"); if (!el) return; const dp = depan();
+  if (!dp) { el.innerHTML = '<div class="kosong">No open defects ahead. Road clear.</div>'; $("#depanR").textContent = "—"; return; }
+  const [L, d] = dp, r = risiko(L); $("#depanR").textContent = jarakTeks(d);
+  el.innerHTML = `<div class="dpn"><img alt="" src="${L.crop}"><div><div class="t"><span class="lencana kecil ${L.ukur.tahap}">${TAHAP[L.ukur.tahap]}</span>${L.jenis}</div><b class="jr">${jarakTeks(d)}</b><small>${saizTeks(L)} · AI risk <b style="color:${warnaSkor(r.s)}">${r.s}</b>${L.kontraktor ? " · " + L.kontraktor.split(" · ")[0] : ""}</small></div></div>
+    <div class="bt"><button class="btn" type="button" data-id="${L.id}">Report</button><button class="btn" type="button" data-peta="${L.id}">📍 Map</button><a class="btn" href="${navURL(L)}" target="_blank" rel="noopener">🧭 Navigate</a></div>`;
 }
 
 /* =================== GELUNG UTAMA =================== */
 let tAkhir = performance.now(), bingkai = 0;
 const pipC = $("#pip").getContext("2d"), besar = $("#pipBesar"), bgC = besar.getContext("2d"); besar.width = W; besar.height = H;
-S.tg = "live";
-function setTg(v) { S.tg = v; $$("#tgSeg button").forEach(b => b.classList.toggle("on", b.dataset.v === v)); 
-  $("#miniTajuk").textContent = v === "live" ? "3D Digital Twin" : "Live view"; $("#tgT3").textContent = v === "live" ? "◇ LIVE · CAM-01 ◇" : "◇ 3D DIGITAL TWIN ◇"; latarMisi(); $("#miniLbl").textContent = v === "live" ? "◇ 3D" : "● LIVE"; $("#miniLbl").classList.toggle("biru", v === "live");
-  $("#tgInfo").textContent = v === "live" ? "CAM-01 · YOLOv8-S RDD · real-time detection" : "3D Digital Twin · route, vehicle and defect pins update live"; bip(1100, 40, .03); }
+S.tg = "peta";
+function setTg(v) { S.tg = v; $$("#tgSeg button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  $("#mpWrap").hidden = v !== "peta"; $("#tgPentas").hidden = v === "peta";
+  $("#miniTajuk").textContent = v === "live" ? "3D Digital Twin" : "Live camera"; $("#tgT3").textContent = v === "live" ? "◇ LIVE · CAM-01 ◇" : "◇ 3D DIGITAL TWIN ◇"; latarMisi(); $("#miniLbl").textContent = v === "live" ? "◇ 3D" : "● LIVE"; $("#miniLbl").classList.toggle("biru", v === "live");
+  $("#tgInfo").textContent = v === "peta" ? "Live map · vehicle, defects and routes" : v === "live" ? "CAM-01 · YOLOv8-S RDD · real-time detection" : "3D Digital Twin · route, vehicle and defect pins update live";
+  if (v === "peta") requestAnimationFrame(() => { if (mSaiz(MP)) { mTiles(MP); mLukis(MP); } }); bip(1100, 40, .03); }
 const bgLive = $("#bgLive"), blC = bgLive.getContext("2d"); bgLive.width = W; bgLive.height = H;
 function latarMisi() { document.body.classList.toggle("liveBg", !TELEFON && S.hlm === "misi" && S.tg === "live" && S.masuk); if (TELEFON) $("#tgPentas").classList.toggle("lut", S.tg !== "live"); }
 $("#tgSeg").onclick = e => { const b = e.target.closest("[data-v]"); if (b) setTg(b.dataset.v); };
@@ -2164,6 +2275,7 @@ function gelung(now) {
     if (S.imbas && performance.now() - S.imbas.t0 < 1500 && S.hlm === "kokpit") lukisProfil();
     if (bingkai % 10 === 0) kemasChip();
     if (S.hlm === "live" && bingkai % 2 === 0) pjDetik();
+    if (S.hlm === "misi" && S.tg === "peta" && bingkai % 2 === 0) mDetik(MP);
     kalTick(now); if (S.hlm === "kal") { lukisKal(now); if (bingkai % 6 === 0) kalBaca(); }
 
   }
@@ -2209,18 +2321,18 @@ function titikPin(kelas) { const t = $("#titik"); t.className = "titik" + (kelas
 function tekan(k) {
   if (performance.now() < LG.kunciHingga) return; ac();
   if (k === "b") LG.pin = LG.pin.slice(0, -1); else if (k === "c") LG.pin = ""; else if (LG.pin.length < 4) LG.pin += k;
-  bip(900 + LG.pin.length * 120, 45, .04); titikPin(); MS.tengok = 1; MS.ping = performance.now(); if (LG.pin.length === 1) cakapMaskot("I'm watching… 👀"); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = LG.pin.length ? "•".repeat(LG.pin.length) + " · " + (4 - LG.pin.length) + " to go" : "ENTER 4-DIGIT PIN";
+  bip(900 + LG.pin.length * 120, 45, .04); titikPin(); MS.tengok = 1; MS.ping = performance.now(); cakapMaskot(`AUTHENTICATING · ${LG.pin.length}/4`, "auth"); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = LG.pin.length ? "•".repeat(LG.pin.length) + " · " + (4 - LG.pin.length) + " to go" : "ENTER 4-DIGIT PIN";
   if (LG.pin.length === 4) setTimeout(sahkan, 180);
 }
 function sahkan() {
   if (LG.pin === PIN[S.peranan]) {
     titikPin("betul"); $("#lgStatus").className = "lgStatus ok"; $("#lgStatus").textContent = "✓ ACCESS GRANTED · " + NAMA[S.peranan].toUpperCase();
     [660, 880, 1320].forEach((f, i) => setTimeout(() => bip(f, 140, .06), i * 110));
-    MS.fasa = "lulus"; MS.t0 = performance.now(); cakapMaskot("Let's roll! 🚀");
+    MS.fasa = "lulus"; MS.t0 = performance.now(); cakapMaskot("ACCESS GRANTED · SENSORS ARMED · STARTING PATROL", "ok");
     setTimeout(() => { const w = document.createElement("div"); w.className = "warp"; w.innerHTML = "<i></i><i></i><i></i><b>ACCESS GRANTED</b>"; document.body.append(w); setTimeout(() => w.remove(), 1800); }, 350);
     setTimeout(masukApp, 1100);
   } else {
-    MS.fasa = "gagal"; MS.t0 = performance.now(); cakapMaskot(["Oops, wrong PIN!", "Hmm, try again 🤔", "That's not it 😅"][LG.salah % 3]);
+    MS.fasa = "gagal"; MS.t0 = performance.now(); cakapMaskot(`ACCESS DENIED · ATTEMPT ${LG.salah + 1}/3`, "err");
     LG.salah++; titikPin("salah"); bip(180, 300, .1, "sawtooth"); $("#lgStatus").className = "lgStatus err";
     if (LG.salah >= 3) { LG.kunciHingga = performance.now() + 10000; LG.salah = 0; const t = setInterval(() => { const s = Math.ceil((LG.kunciHingga - performance.now()) / 1000); if (s <= 0) { clearInterval(t); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = "ENTER 4-DIGIT PIN"; } else $("#lgStatus").textContent = `⛔ LOCKED · try again in ${s} s`; }, 250); }
     else $("#lgStatus").textContent = `✕ WRONG PIN · ${3 - LG.salah} attempts left`;
