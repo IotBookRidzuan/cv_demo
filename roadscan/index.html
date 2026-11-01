@@ -393,7 +393,30 @@ padding:8px 10px;border-radius:9px;background:var(--kaca);border:1px solid var(-
 .gpsP{cursor:pointer;color:var(--cyan);font:500 11px/1.4 var(--mono);text-decoration:underline dotted;text-underline-offset:3px}
 .navBtn{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .navBtn .btn{padding:7px 10px;font-size:12px}
+.banKrit{grid-column:1/-1;order:-2;appearance:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;text-align:left;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,59,78,.55);background:linear-gradient(90deg,rgba(255,59,78,.22),rgba(255,59,78,.06) 70%,transparent);color:var(--fg);cursor:pointer;font:500 13.5px/1.4 var(--body)}
+.banKrit .ik{font-size:20px;animation:kelip 1s steps(2) infinite}
+.banKrit b{font:700 14px/1.2 var(--display);letter-spacing:.04em;color:var(--fg)}
+.banKrit .cip{padding:4px 8px;border-radius:6px;background:rgba(3,6,14,.35);font:600 11.5px/1 var(--mono);white-space:nowrap}
+.banKrit .go{margin-left:auto;font:600 12px/1 var(--mono);color:var(--goldT)}
+.notif{display:grid;gap:7px;max-height:300px;overflow:auto}
+.nf{appearance:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:9px 10px;border-radius:10px;border:1px solid transparent;border-left:3px solid var(--dim);background:var(--kaca2);text-align:left;cursor:pointer}
+.nf:hover{border-color:var(--garisHi)}
+.nf .ik{font-size:17px}
+.nf span{min-width:0;font:500 11px/1.4 var(--mono);color:var(--muted)}
+.nf span b{display:block;font:600 13px/1.25 var(--display);color:var(--fg)}
+.nf i{width:8px;height:8px;border-radius:50%;background:var(--high);box-shadow:0 0 8px var(--high)}
+.nf.baca i{visibility:hidden}.nf.baca{opacity:.72}
+.aiMisi{display:grid;gap:10px}
+.aiR{display:grid;gap:6px;padding:11px 12px;border-radius:10px;background:var(--kaca2);border-left:3px solid var(--gold)}
+.aiR .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 13.5px/1.25 var(--display)}
+.aiR p{margin:0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.aiR p b{color:var(--fg)}
+.aiR .bt{display:flex;gap:6px;flex-wrap:wrap}
+.aiR .bt .btn{padding:6px 9px;font-size:11.5px}
+.aiRingkas{font-size:13px;line-height:1.5;color:var(--muted);margin:0}
+.aiRingkas b{color:var(--fg)}
 .lgBtns{display:flex;
+
 gap:8px;justify-content:center;flex-wrap:wrap}
 @media (max-width:760px){.ringkas{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .penapis{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -534,6 +557,7 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
   <!-- PUSAT MISI -->
   <main class="hlm" id="hMisi" data-tajuk="Mission Centre">
     <div class="misi">
+      <button class="banKrit" id="banKrit" type="button" hidden></button>
       <div class="kolum">
         <section class="kaca br salam">
           <small id="salamKecil">Mission R-0811 · Night patrol</small>
@@ -557,9 +581,11 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
           <button class="btn" type="button" data-pergi="kokpit">⤢ Open cockpit</button>
         </div>
         <div class="kaca br tgPentas lut" id="tgPentas"><canvas id="pipBesar"></canvas><span class="t3" id="tgT3">◇ LIVE · CAM-01 ◇</span></div>
+        <section class="kaca br"><div class="hd"><h2>🤖 AI analysis</h2><span class="r" id="cuacaR">weather…</span></div><div class="bd aiMisi" id="aiMisi"><div class="kosong">The AI briefing appears after the first detections.</div></div></section>
       </div>
       <div class="kolum">
         <section class="kaca br"><div class="hd"><h2 id="miniTajuk">3D Digital Twin</h2><span class="r">tap to swap</span></div><div class="bd"><div class="pip" id="miniPip" role="button" tabindex="0" aria-label="Swap main view"><canvas id="pip" width="480" height="270"></canvas><span class="lblL biru" id="miniLbl">◇ 3D</span><span class="tukar">⇄ SWAP</span></div></div></section>
+        <section class="kaca br"><div class="hd"><h2>Critical notifications</h2><span class="r"><button class="btn" id="notifBaca" type="button" style="padding:5px 9px;font-size:11px">Mark all read</button></span></div><div class="bd"><div class="notif" id="notif"><div class="kosong">No critical notifications.</div></div></div></section>
         <section class="kaca br"><div class="hd"><h2>Latest alerts</h2><span class="r" id="hAmaranN">0</span></div><div class="bd"><div class="amaran" id="hAmaran"><div class="kosong">Waiting for the first detection…</div></div></div></section>
         <div class="cepat">
           <button type="button" data-pergi="live"><span class="ik">🗺</span><b>Live map</b><small>Vehicle · defects · routes</small></button>
@@ -1132,6 +1158,7 @@ function kemasSemua() {
   $("#kLubang").textContent = A.filter(l => l.kod === "D40").length; $("#kRetak").textContent = A.filter(l => l.kod !== "D40").length; $("#kKrit").textContent = krit; $("#kKm").textContent = (A.length / Math.max(.1, S.s / 1000)).toFixed(1);
   // misi
   $("#hJum").textContent = A.length; $("#hKrit").textContent = krit; $("#hHantar").textContent = A.filter(l => l.hantar).length; $("#hIkj").textContent = ikj(); $("#hAmaranN").textContent = A.length;
+  paparNotif(); paparAIMisi();
   $("#hAmaran").innerHTML = A.length ? A.slice(0, 6).map(L => `<button type="button" data-id="${L.id}"><img alt="" src="${L.crop}"><div><b><span class="lencana kecil ${L.ukur.tahap}">${TAHAP[L.ukur.tahap]}</span>${L.jenis}</b><small>${saizTeks(L)} · ${L.masa.toLocaleTimeString("en-GB")}</small></div></button>`).join("") : `<div class="kosong">Waiting for the first detection…</div>`;
   // badge JKR
   const baru = A.filter(l => l.status === 1).length; $("#bdg").hidden = !baru; $("#bdg").textContent = baru > 99 ? "99+" : baru;
@@ -1894,6 +1921,75 @@ function hentiGPS(senyap) { if (gpsId != null) navigator.geolocation.clearWatch(
 $("#lmGps").onclick = () => gpsId != null ? hentiGPS() : mulaGPS();
 $("#tGps").addEventListener("change", e => { if (e.target.value === "peranti") mulaGPS(); else if (gpsId != null) hentiGPS(); });
 
+/* =================== NOTIFIKASI KRITIKAL & ANALISIS AI (Mission Centre) =================== */
+S.ack = new Set(); S.cuaca = null; S.jalan = {};
+async function ambilCuaca() {
+  const v = kedudukan(S.s);
+  try {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${v.lat.toFixed(3)}&longitude=${v.lon.toFixed(3)}&hourly=precipitation_probability,precipitation&forecast_days=2&timezone=auto`);
+    const d = await r.json(), t = d.hourly.time, pr = d.hourly.precipitation_probability, mm = d.hourly.precipitation, kini2 = Date.now();
+    let i = t.findIndex((s, k) => new Date(s).getTime() > kini2 - 3600e3 && pr[k] >= 50);
+    const depan = pr.filter((_, k) => { const tt = new Date(t[k]).getTime(); return tt > kini2 - 3600e3 && tt < kini2 + 24 * 3600e3; });
+    S.cuaca = i >= 0 ? { jam: new Date(t[i]), prob: pr[i], mm: mm[i], sumber: "Open-Meteo forecast" } : { jam: null, prob: depan.length ? Math.max(...depan) : 0, sumber: "Open-Meteo forecast" };
+  } catch (e) {
+    const j = new Date(); j.setMinutes(0, 0, 0); if (j.getHours() >= 15) { j.setDate(j.getDate() + 1); } j.setHours(15);
+    S.cuaca = { jam: j, prob: 75, mm: 6, sumber: "typical afternoon thunderstorm (simulated: live forecast works in the hosted version)" };
+  }
+  const c = S.cuaca; $("#cuacaR").textContent = c.jam ? `🌧 Rain ${c.jam.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · ${c.prob}%` : `☀ No heavy rain forecast · max ${c.prob}%`;
+  kemasSemua();
+}
+function jamHujan() { const c = S.cuaca; if (!c || !c.jam) return null; return (c.jam.getTime() - Date.now()) / 3600e3; }
+function risiko(L) {
+  const f = ramalan(L), jh = jamHujan(), hujan = jh !== null && jh < 24;
+  let s = f.skor + (hujan && (L.kod === "D40" || L.kod === "D20") ? 12 : hujan ? 5 : 0) + (L.kod === "D40" && L.ukur.d > 50 ? 8 : 0);
+  return { f, s: Math.min(100, Math.round(s)), hujan, jh };
+}
+function namaJalan(L) {
+  if (S.jalan[L.id] !== undefined) return S.jalan[L.id];
+  S.jalan[L.id] = null;
+  setTimeout(async () => { try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=17&lat=${L.lat}&lon=${L.lon}`, { headers: { "Accept-Language": "en" } }); const d = await r.json(); const a = d.address || {}; S.jalan[L.id] = [a.road, a.suburb || a.village || a.town || a.city].filter(Boolean).join(", ") || ""; paparAIMisi(); } catch (e) { S.jalan[L.id] = ""; } }, 1200 * Object.values(S.jalan).filter(v => v === null).length);
+  return null;
+}
+function lokasiTeks(L) { const n = namaJalan(L); return n ? n : `${L.lat.toFixed(5)}, ${L.lon.toFixed(5)}`; }
+const fmtJam = d => d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+function paparAIMisi() {
+  const el = $("#aiMisi"); if (!el) return;
+  const buka = aktif().filter(L => L.status < 4); if (!buka.length) { el.innerHTML = '<div class="kosong">The AI briefing appears after the first detections.</div>'; return; }
+  const R = buka.map(L => [L, risiko(L)]).sort((a, b) => b[1].s - a[1].s), top = R.slice(0, 3), c = S.cuaca, jh = jamHujan();
+  const krit30 = R.filter(([, r]) => r.f.hariK !== null && r.f.hariK <= 30).length, tambah = R.reduce((a, [, r]) => a + r.f.k90 - r.f.k0, 0);
+  const ring = `<p class="aiRingkas"><b>${buka.length} open defects.</b> ${krit30} ${krit30 === 1 ? "is" : "are"} forecast to be critical within 30 days.${c && c.jam && jh < 24 ? ` <b>Rain expected at ${fmtJam(c.jam)} (${c.prob}%)</b>: water hides potholes from drivers and speeds up breakup.` : ""} Delaying all repairs 90 days adds about <b>${RM(tambah)}</b>.</p>`;
+  el.innerHTML = ring + top.map(([L, r], i) => {
+    const f = r.f, lub = L.kod === "D40", d7 = Math.round(f.dAt(7)), dTeks = lub ? `${L.ukur.d} mm deep, forecast ${d7} mm in 7 days` : `crack ${L.ukur.d} mm wide, forecast ${d7} mm in 7 days`;
+    const bahaya = lub ? (L.ukur.d >= 50 ? "High risk to motorcyclists and tyre damage for cars." : "Risk to motorcyclists, worse at night and in the wet.") : L.kod === "D20" ? "Surface is breaking up and may turn into potholes." : "Water can enter the crack and weaken the road base.";
+    const tindakan = L.ukur.tahap === "H" || r.s >= 70 ? "Place warning cones today and patch within 24 hours." : f.hariK !== null && f.hariK <= 30 ? `Repair before ${fmtT(new Date(kini().getTime() + f.hariK * 864e5))}.` : "Schedule with routine maintenance.";
+    return `<div class="aiR" style="border-left-color:${warnaSkor(r.s)}"><div class="t"><span class="lencana kecil ${L.ukur.tahap}">${TAHAP[L.ukur.tahap]}</span>${i + 1}. ${L.jenis} · ${lokasiTeks(L)}<span style="margin-left:auto;font:700 12px/1 var(--mono);color:${warnaSkor(r.s)}">risk ${r.s}</span></div>
+      <p>${dTeks}${f.hariK !== null && f.hariK > 0 ? `; becomes critical in <b>~${f.hariK} days</b>` : f.hariK === 0 ? "; <b>already critical</b>" : ""}.${r.hujan ? ` <b>Rain at ${fmtJam(c.jam)}</b> will fill it with water and hide it from drivers.` : ""} ${bahaya} <b>${tindakan}</b></p>
+      <div class="bt"><button class="btn" type="button" data-id="${L.id}">Open report</button><button class="btn" type="button" data-peta="${L.id}">📍 Map</button><a class="btn" href="${navURL(L)}" target="_blank" rel="noopener">🧭 Navigate</a></div></div>`;
+  }).join("") + `<p class="nota" style="margin:0">AI analysis combines defect size, growth trend, severity and the ${c ? c.sumber : "weather forecast"}. Simulated data.</p>`;
+}
+function senaraiNotif() {
+  const N = [];
+  aktif().filter(L => L.status < 4).forEach(L => {
+    const f = ramalan(L), t = trend(L);
+    if (L.ukur.tahap === "H") N.push({ k: L.id + ":H", L, ik: "🚨", w: "var(--high)", t: `Critical ${L.jenis.toLowerCase()}`, s: `${L.id} · act within 24 h` });
+    else if (f.hariK !== null && f.hariK <= 14) N.push({ k: L.id + ":F", L, ik: "📈", w: "var(--med)", t: `Forecast critical in ~${f.hariK} days`, s: `${L.jenis} · ${L.id}` });
+    if (lewat(L)) N.push({ k: L.id + ":OD" + fmtT(L.due), L, ik: "⏰", w: "var(--high)", t: "Work order overdue", s: `${L.id} · due ${fmtT(L.due)} · ${L.kontraktor.split(" · ")[0]}` });
+    if (t && t.naik) N.push({ k: L.id + ":UP" + L.sejarah.length, L, ik: "⇪", w: "var(--med)", t: `Escalated to ${TAHAP[L.ukur.tahap]}`, s: `${L.jenis} · +${t.dd} mm since last scan` });
+  });
+  const pr = { "🚨": 0, "⏰": 1, "⇪": 2, "📈": 3 }; return N.sort((a, b) => pr[a.ik] - pr[b.ik]);
+}
+function paparNotif() {
+  const el = $("#notif"); if (!el) return; const N = senaraiNotif(), belum = N.filter(n => !S.ack.has(n.k));
+  el.innerHTML = N.length ? N.slice(0, 12).map(n => `<button class="nf${S.ack.has(n.k) ? " baca" : ""}" type="button" data-nf="${n.k}" data-id="${n.L.id}" style="border-left-color:${n.w}"><span class="ik">${n.ik}</span><span><b>${n.t}</b>${n.s} · <span class="gpsP" data-peta="${n.L.id}">📍 map</span></span><i></i></button>`).join("") : '<div class="kosong">No critical notifications. All clear.</div>';
+  const krit = N.filter(n => n.ik === "🚨").length, od = N.filter(n => n.ik === "⏰").length, fc = N.filter(n => n.ik === "📈").length, c = S.cuaca, jh = jamHujan(), b = $("#banKrit");
+  b.hidden = !(krit || od);
+  if (!b.hidden) b.innerHTML = `<span class="ik">🚨</span><b>${krit ? `${krit} CRITICAL DEFECT${krit > 1 ? "S" : ""} NEED ACTION TODAY` : `${od} OVERDUE WORK ORDER${od > 1 ? "S" : ""}`}</b>${od && krit ? `<span class="cip">⏰ ${od} overdue</span>` : ""}${fc ? `<span class="cip">📈 ${fc} turning critical soon</span>` : ""}${c && c.jam && jh < 24 ? `<span class="cip">🌧 rain ${fmtJam(c.jam)} · ${c.prob}%</span>` : ""}${belum.length ? `<span class="cip">${belum.length} unread</span>` : ""}<span class="go">Open in JKR portal →</span>`;
+}
+$("#banKrit").onclick = () => { pergi("portal"); S.tapis = "H"; $$("#penapis [data-f]").forEach(x => x.classList.toggle("on", x.dataset.f === "H")); paparPortal(); };
+$("#notif").addEventListener("click", e => { const b = e.target.closest("[data-nf]"); if (b) { S.ack.add(b.dataset.nf); setTimeout(paparNotif, 0); } });
+$("#notifBaca").onclick = () => { senaraiNotif().forEach(n => S.ack.add(n.k)); paparNotif(); audit("Critical notifications marked as read"); };
+setInterval(() => { if (S.masuk) ambilCuaca(); }, 30 * 60e3);
+
 /* =================== GELUNG UTAMA =================== */
 let tAkhir = performance.now(), bingkai = 0;
 const pipC = $("#pip").getContext("2d"), besar = $("#pipBesar"), bgC = besar.getContext("2d"); besar.width = W; besar.height = H;
@@ -2005,6 +2101,7 @@ function sahkan() {
 $("#pad").onclick = e => { const b = e.target.closest("button"); if (b) tekan(b.dataset.k || b.textContent); };
 addEventListener("keydown", e => { if ($("#login").hidden || $("#login").classList.contains("keluar")) return; if (/^\d$/.test(e.key)) tekan(e.key); else if (e.key === "Backspace") tekan("b"); else if (e.key === "Escape") tekan("c"); });
 function masukApp() {
+  setTimeout(ambilCuaca, 1500);
   setTimeout(() => audit("Signed in"), 0); aktifAkhir = Date.now();
   $("#login").classList.add("keluar"); $("#lgJam").hidden = true;
   setTimeout(() => { $("#login").hidden = true; $("#login").classList.remove("keluar"); }, 900);
