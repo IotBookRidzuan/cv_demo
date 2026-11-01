@@ -59,7 +59,48 @@ width:auto;display:block}
 .lgAmaran{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(242,193,78,.08);border:1px solid rgba(242,193,78,.3);font:500 11.5px/1.45 var(--body);color:var(--muted)}
 .lgAmaran b{color:var(--goldT)}
 .lgKiri .tag{font:600 12px/1 var(--mono);letter-spacing:.32em;color:var(--cyan);text-transform:uppercase}
-.lgKiri h1{margin:0;font:700 clamp(46px,8.5vw,112px)/.88 var(--display);letter-spacing:.02em;text-shadow:0 0 40px rgba(90,169,255,.35)}
+.lgKiri h1{margin:0;font:700 clamp(46px,8.5vw,112px)/.88 var(--display);letter-spacing:.02em;background:linear-gradient(100deg,var(--fg) 0 40%,#FFE19A 48%,#fff 50%,#FFE19A 52%,var(--fg) 60% 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:kilatTajuk 5s ease-in-out infinite,naikMasuk .9s cubic-bezier(.2,.8,.2,1) both;filter:drop-shadow(0 0 28px rgba(90,169,255,.35))}
+.lgKiri h1 span{-webkit-text-fill-color:var(--cyan)}
+@keyframes kilatTajuk{0%,30%{background-position:100% 0}70%,100%{background-position:0 0}}
+@keyframes naikMasuk{from{opacity:0;transform:translateY(24px);filter:blur(8px)}}
+.lgLogo{animation:naikMasuk .8s .1s cubic-bezier(.2,.8,.2,1) both}
+.lgKiri .tag{animation:naikMasuk .8s .25s both}
+.lgKiri p,.ciri{animation:naikMasuk .8s .45s both}
+.lgKad{animation:kadMasuk 1s .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes kadMasuk{from{opacity:0;transform:translateX(40px) scale(.96);filter:blur(10px)}}
+.maskot{position:relative;animation:naikMasuk .8s .6s both}
+#lgMaskot{width:100%;height:170px;display:block}
+.gelembung{position:absolute;left:var(--gx,30%);top:2px;transform:translateX(-50%);padding:7px 12px;border-radius:14px 14px 14px 4px;background:#fff;color:#14203a;font:600 12.5px/1.2 var(--body);white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.3);transition:left .2s linear;animation:gelembungMasuk .4s cubic-bezier(.3,1.6,.5,1)}
+.gelembung.tukar{animation:gelembungMasuk .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gelembungMasuk{from{transform:translateX(-50%) scale(.4);opacity:0}}
+.ciri span{transition:transform .2s,border-color .2s}.ciri span:hover{transform:translateY(-2px);border-color:var(--garisHi)}
+.pad button{transition:transform .08s,background .15s,box-shadow .2s}
+.pad button:hover{box-shadow:0 0 0 1px var(--garisHi),0 6px 18px rgba(0,0,0,.25)}
+.warp{position:fixed;inset:0;z-index:26;pointer-events:none;display:grid;place-items:center;overflow:hidden}
+.warp i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:3px solid #F2C14E;box-shadow:0 0 30px rgba(242,193,78,.6);animation:cincin 1.2s cubic-bezier(.2,.7,.2,1) forwards}
+.warp i:nth-child(2){border-color:#5AA9FF;box-shadow:0 0 30px rgba(90,169,255,.6);animation-delay:.12s}
+.warp i:nth-child(3){animation-delay:.24s}
+.warp b{position:relative;font:700 clamp(26px,5vw,54px)/1 var(--display);letter-spacing:.18em;color:#FFE19A;text-shadow:0 0 30px rgba(242,193,78,.8);animation:capLulus 1.5s cubic-bezier(.2,.8,.2,1) forwards}
+.warp::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(242,193,78,.25),transparent 60%);animation:pudar 1.6s forwards}
+@keyframes cincin{to{transform:scale(40);opacity:0}}
+@keyframes capLulus{0%{transform:scale(.6);opacity:0;letter-spacing:.6em}25%{transform:scale(1);opacity:1;letter-spacing:.18em}75%{opacity:1}100%{opacity:0;transform:scale(1.08)}}
+@keyframes pudar{to{opacity:0}}
+#app.masukApp .kaca{animation:panelMasuk .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes panelMasuk{from{opacity:0;transform:translateY(22px) scale(.98);filter:blur(6px)}}
+.kaca.br{transition:border-color .25s,box-shadow .25s,transform .25s}
+.kaca.br:hover{border-color:rgba(242,193,78,.35);box-shadow:0 22px 56px rgba(0,0,0,.4),0 0 0 1px rgba(242,193,78,.12)}
+.btn.utama,.btn.emas{position:relative;overflow:hidden;isolation:isolate}
+.btn.utama::after,.btn.emas::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);transform:translateX(-130%);animation:kilau 4s ease-in-out infinite;pointer-events:none}
+@keyframes aliran{to{background-position:300% 300%}}
+@keyframes kilau{0%,60%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.btn{transition:transform .12s,border-color .2s,background .2s}
+.btn:active{transform:scale(.97)}
+.liveScan{position:fixed;left:0;right:0;top:0;height:3px;z-index:1;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(242,193,78,.8),rgba(90,169,255,.9),transparent);box-shadow:0 0 18px rgba(90,169,255,.7);opacity:0;animation:imbasLive 5s linear infinite}
+body.liveBg .liveScan{opacity:.75}
+@keyframes imbasLive{from{transform:translateY(0)}to{transform:translateY(100vh)}}
+.kpi b{text-shadow:0 0 22px currentColor}
+.nav svg{transition:transform .2s}.nav:hover svg{transform:translateY(-2px)}
+.nav[aria-current="page"] svg{filter:drop-shadow(0 0 6px rgba(242,193,78,.7))}
 .lgKiri h1 span{color:var(--cyan)}
 .lgKiri p{margin:0;max-width:52ch;color:var(--muted);font-size:16px;line-height:1.6}
 .boot{font:500 12.5px/1.75 var(--mono);color:var(--muted);min-height:120px;white-space:pre-wrap}
@@ -67,7 +108,7 @@ width:auto;display:block}
 .ciri{display:flex;flex-wrap:wrap;gap:8px}
 .ciri span{padding:7px 11px;border:1px solid var(--garis);border-radius:99px;font:600 12px/1 var(--mono);color:var(--fg);background:rgba(7,13,24,.5)}
 .lgKad{position:relative;padding:26px;border-radius:18px;background:var(--kaca);border:1px solid var(--garis);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);display:grid;gap:18px}
-.lgKad::before{content:"";position:absolute;inset:-1px;border-radius:18px;padding:1px;background:linear-gradient(140deg,rgba(90,169,255,.7),transparent 35%,transparent 65%,rgba(255,204,0,.5));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.lgKad::before{content:"";position:absolute;inset:-1px;border-radius:18px;padding:1.5px;background:linear-gradient(120deg,rgba(90,169,255,.9),transparent 25%,transparent 45%,rgba(255,204,0,.8) 55%,transparent 65%,transparent 85%,rgba(90,169,255,.9));background-size:300% 300%;animation:aliran 6s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .lgKad h2{margin:0;font:600 13px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
 .peranan{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .peranan button{appearance:none;display:grid;gap:6px;justify-items:start;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--garis);background:rgba(14,24,40,.6);cursor:pointer}
@@ -487,7 +528,7 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
 </style>
 </head>
 <body>
-<canvas id="bg3d"></canvas><canvas id="bgLive"></canvas>
+<canvas id="bg3d"></canvas><canvas id="bgLive"></canvas><div class="liveScan" aria-hidden="true"></div>
 <div class="vignet"></div>
 
 <!-- ================= LOGIN ================= -->
@@ -498,6 +539,7 @@ textarea{width:100%;height:260px;background:#040a12;border:1px solid var(--garis
     <h1>ROAD<br>SCAN<span>-08</span></h1>
     <p>Smart road inspection system. AI detects potholes and cracks, measures their size and depth, tags the GPS location and sends each report straight to JKR (Public Works Department).</p>
     <div class="ciri"><span>YOLOv8 · RDD2022</span><span>Depth scanning</span><span>Auto GPS tagging</span><span>JKR uplink</span></div>
+    <div class="maskot"><canvas id="lgMaskot" aria-label="Scanny, the ROADSCAN mascot, driving and tagging potholes"></canvas><div class="gelembung" id="gelembung">Hi! I'm Scanny 👋</div></div>
     <div class="boot" id="boot"></div>
   </div>
   <div class="lgKad">
@@ -1990,6 +2032,89 @@ $("#notif").addEventListener("click", e => { const b = e.target.closest("[data-n
 $("#notifBaca").onclick = () => { senaraiNotif().forEach(n => S.ack.add(n.k)); paparNotif(); audit("Critical notifications marked as read"); };
 setInterval(() => { if (S.masuk) ambilCuaca(); }, 30 * 60e3);
 
+/* =================== MASKOT "SCANNY" (login) =================== */
+const MS = { fasa: "jalan", t0: 0, x: 0, lubang: [], pop: [], tengok: 0, ping: 0, jarak: 0, akan: 1.2, w: 0, h: 170, ctx: null, kira: 0 };
+function saizMaskot() { const c = $("#lgMaskot"); if (!c) return; const r = c.getBoundingClientRect(); if (!r.width) return; const d = Math.min(devicePixelRatio || 1, 2); MS.w = r.width; c.width = Math.round(r.width * d); c.height = Math.round(MS.h * d); MS.ctx = c.getContext("2d"); MS.ctx.setTransform(d, 0, 0, d, 0, 0); }
+addEventListener("resize", saizMaskot);
+const KATA = ["Hi! I'm Scanny 👋", "I scan roads for potholes 🔍", "Every find gets a GPS pin 📍", "Reports go straight to JKR 🏛", "Enter your PIN to start 🔐"];
+let kataI = 0, kataT = 0;
+function cakapMaskot(t) { const g = $("#gelembung"); if (!g) return; g.textContent = t; g.classList.remove("tukar"); void g.offsetWidth; g.classList.add("tukar"); kataT = performance.now(); }
+function kiraNaik(el) { if (!el) return; const ke = parseInt(el.textContent) || 0, t0 = performance.now(); (function f() { const k = Math.min(1, (performance.now() - t0) / 1100), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(ke * e); if (k < 1) requestAnimationFrame(f); else el.textContent = ke; })(); }
+function lukisMaskot(dt, now) {
+  const x = MS.ctx; if (!x || !MS.w) { saizMaskot(); return; } const w = MS.w, h = MS.h, rY = 128;
+  x.clearRect(0, 0, w, h);
+  if (now - kataT > 3600 && MS.fasa === "jalan" && !LG.pin.length) { kataI = (kataI + 1) % KATA.length; cakapMaskot(KATA[kataI]); }
+  const lulus = MS.fasa === "lulus", gagal = MS.fasa === "gagal" && now - MS.t0 < 900;
+  if (MS.fasa === "gagal" && !gagal) MS.fasa = "jalan";
+  const laju = lulus ? 260 + (now - MS.t0) * .9 : 120; MS.jarak += laju * dt;
+  // jalan
+  const g1 = x.createLinearGradient(0, rY - 16, 0, rY + 22); g1.addColorStop(0, "rgba(40,48,62,.95)"); g1.addColorStop(1, "rgba(22,27,36,.95)");
+  x.fillStyle = g1; x.beginPath(); x.roundRect ? x.roundRect(0, rY - 16, w, 38, 10) : x.rect(0, rY - 16, w, 38); x.fill();
+  x.fillStyle = "rgba(255,214,90,.85)"; for (let d = -(MS.jarak % 60); d < w; d += 60) x.fillRect(d, rY + 2, 30, 3);
+  x.strokeStyle = "rgba(255,255,255,.35)"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, rY - 14); x.lineTo(w, rY - 14); x.moveTo(0, rY + 20); x.lineTo(w, rY + 20); x.stroke();
+  // kedudukan kereta
+  const cxBase = Math.max(110, w * .3); let cx = cxBase;
+  if (lulus) cx = cxBase + Math.pow((now - MS.t0) / 1000, 2) * 900; if (gagal) cx += Math.sin((now - MS.t0) / 28) * 6;
+  const bob = Math.sin(now / 90) * 1.3, cy = rY - 30 + bob;
+  $("#gelembung") && $("#gelembung").style.setProperty("--gx", Math.min(w - 90, Math.max(90, cx + 20)) + "px");
+  // lubang
+  MS.akan -= dt; if (MS.akan <= 0 && !lulus) { MS.lubang.push({ x: w + 40, r: 10 + Math.random() * 10, jumpa: false }); MS.akan = 1.4 + Math.random() * 1.8; }
+  MS.lubang.forEach(L => { L.x -= laju * dt; });
+  MS.lubang = MS.lubang.filter(L => L.x > -60);
+  const bA = cx + 50, bB = cx + 150;
+  MS.lubang.forEach(L => {
+    x.fillStyle = "#07090c"; x.beginPath(); x.ellipse(L.x, rY + 6, L.r, L.r * .32, 0, 0, 7); x.fill(); x.strokeStyle = "rgba(160,160,150,.4)"; x.lineWidth = 1.2; x.stroke();
+    if (!L.jumpa && L.x > bA && L.x < bB) { L.jumpa = true; MS.kira++; MS.pop.push({ L, t: now }); bip(1500, 50, .02); }
+    if (L.jumpa) { x.strokeStyle = "#FFA21F"; x.lineWidth = 2; x.beginPath(); x.ellipse(L.x, rY + 6, L.r + 4, L.r * .32 + 3, 0, 0, 7); x.stroke(); }
+  });
+  // pin GPS melompat
+  MS.pop = MS.pop.filter(p => p.L.x > -40);
+  MS.pop.forEach(p => {
+    const k = Math.min(1, (now - p.t) / 450), s = k < 1 ? 1 + Math.sin(k * Math.PI) * .45 : 1, px2 = p.L.x, py = rY - 8 - 26 * Math.min(1, k * 1.4);
+    x.save(); x.translate(px2, py); x.scale(s, s); x.fillStyle = "#FF5A5F"; x.strokeStyle = "#fff"; x.lineWidth = 1.6; x.beginPath(); x.moveTo(0, 12); x.bezierCurveTo(-10, -1, -9, -14, 0, -14); x.bezierCurveTo(9, -14, 10, -1, 0, 12); x.fill(); x.stroke(); x.fillStyle = "#fff"; x.beginPath(); x.arc(0, -5, 3.5, 0, 7); x.fill(); x.restore();
+    const ft = (now - p.t) / 1000; if (ft < 1.2) { x.globalAlpha = 1 - ft / 1.2; x.fillStyle = "#36D67A"; x.font = "700 12px 'JetBrains Mono',monospace"; x.fillText("+1 report", px2 + 10, py - 18 - ft * 20); x.globalAlpha = 1; }
+  });
+  // sinar imbasan
+  if (!lulus) { const sg = x.createLinearGradient(cx + 40, 0, bB, 0); sg.addColorStop(0, "rgba(242,193,78,.45)"); sg.addColorStop(1, "rgba(90,169,255,.04)"); x.fillStyle = sg; x.beginPath(); x.moveTo(cx + 44, cy + 14); x.lineTo(bB, rY - 8); x.lineTo(bB, rY + 18); x.lineTo(bA, rY + 18); x.closePath(); x.fill();
+    const sl = bA + ((now / 6) % (bB - bA)); x.strokeStyle = "rgba(255,226,154,.8)"; x.lineWidth = 1.5; x.beginPath(); x.moveTo(sl, rY - 6); x.lineTo(sl, rY + 18); x.stroke(); }
+  // garis laju
+  if (lulus) { x.strokeStyle = "rgba(255,255,255,.5)"; x.lineWidth = 2; for (let i = 0; i < 7; i++) { const yy = cy - 10 + i * 7, ll = 30 + (i * 37 % 50); x.beginPath(); x.moveTo(cx - 60 - ll - (i * 13 % 30), yy); x.lineTo(cx - 55, yy); x.stroke(); } }
+  // kereta
+  x.save(); x.translate(cx, cy);
+  x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.ellipse(0, 30 - bob, 46, 6, 0, 0, 7); x.fill();
+  const gb = x.createLinearGradient(0, -22, 0, 22); gb.addColorStop(0, "#7cc0ff"); gb.addColorStop(1, "#2a6fd6");
+  x.fillStyle = gb; x.beginPath(); x.roundRect ? x.roundRect(-44, -18, 90, 40, 16) : x.rect(-44, -18, 90, 40); x.fill();
+  x.fillStyle = "#F2C14E"; x.beginPath(); x.roundRect ? x.roundRect(-44, 8, 90, 7, 3) : x.rect(-44, 8, 90, 7); x.fill();
+  // kubah sensor & antena
+  x.fillStyle = "#F2C14E"; x.beginPath(); x.ellipse(-8, -18, 14, 9, 0, Math.PI, 0); x.fill();
+  x.strokeStyle = "#cfd8e8"; x.lineWidth = 2; x.beginPath(); x.moveTo(-24, -18); x.lineTo(-30, -36); x.stroke();
+  const pk = (now - MS.ping) / 600; x.fillStyle = Math.sin(now / 200) > 0 ? "#FF5A5F" : "#ffd0d2"; x.beginPath(); x.arc(-30, -37, 3.5, 0, 7); x.fill();
+  if (pk < 1) { x.strokeStyle = `rgba(90,169,255,${1 - pk})`; x.lineWidth = 2; x.beginPath(); x.arc(-30, -37, 4 + pk * 22, 0, 7); x.stroke(); }
+  // cermin depan dengan mata
+  x.fillStyle = "#0e1a33"; x.beginPath(); x.roundRect ? x.roundRect(4, -12, 36, 20, 8) : x.rect(4, -12, 36, 20); x.fill();
+  const kelip = (now % 3400) < 130, gembira = lulus, sedih = gagal, tg = MS.tengok; MS.tengok = Math.max(0, MS.tengok - dt * .8);
+  [[14, -2], [30, -2]].forEach(([ex, ey]) => {
+    if (gembira) { x.strokeStyle = "#fff"; x.lineWidth = 2.6; x.beginPath(); x.arc(ex, ey + 2, 5, Math.PI * 1.1, Math.PI * 1.9); x.stroke(); return; }
+    if (sedih) { x.strokeStyle = "#ff8a95"; x.lineWidth = 2.4; x.beginPath(); x.moveTo(ex - 4, ey - 3); x.lineTo(ex + 4, ey + 3); x.moveTo(ex + 4, ey - 3); x.lineTo(ex - 4, ey + 3); x.stroke(); return; }
+    if (kelip) { x.strokeStyle = "#fff"; x.lineWidth = 2.4; x.beginPath(); x.moveTo(ex - 5, ey); x.lineTo(ex + 5, ey); x.stroke(); return; }
+    x.fillStyle = "#fff"; x.beginPath(); x.ellipse(ex, ey, 6, 6.5, 0, 0, 7); x.fill();
+    x.fillStyle = "#14203a"; x.beginPath(); x.arc(ex + 1.5 + tg * 1.5, ey + .5 - tg * 2.5, 3.2, 0, 7); x.fill();
+    x.fillStyle = "#fff"; x.beginPath(); x.arc(ex + 2.6 + tg * 1.5, ey - 1 - tg * 2.5, 1.1, 0, 7); x.fill();
+  });
+  // pipi & senyum
+  x.fillStyle = "rgba(255,120,140,.55)"; x.beginPath(); x.arc(8, 8, 3, 0, 7); x.arc(37, 8, 3, 0, 7); x.fill();
+  x.strokeStyle = sedih ? "#ff8a95" : "#fff"; x.lineWidth = 2; x.beginPath(); sedih ? x.arc(22, 9, 4, Math.PI * 1.15, Math.PI * 1.85) : x.arc(22, 3, 4, Math.PI * .15, Math.PI * .85); x.stroke();
+  // lampu
+  x.fillStyle = "#FFE19A"; x.beginPath(); x.arc(44, 4, 3, 0, 7); x.fill();
+  x.fillStyle = "rgba(255,90,95,.9)"; x.beginPath(); x.arc(-43, 2, 2.5, 0, 7); x.fill();
+  // tayar
+  [[-26, 22], [26, 22]].forEach(([wx, wy]) => { x.fillStyle = "#141820"; x.beginPath(); x.arc(wx, wy, 10, 0, 7); x.fill(); x.fillStyle = "#9aa6bd"; x.beginPath(); x.arc(wx, wy, 4.5, 0, 7); x.fill(); const a = MS.jarak / 10; x.strokeStyle = "#141820"; x.lineWidth = 2; x.beginPath(); for (let k = 0; k < 3; k++) { const aa = a + k * 2.09; x.moveTo(wx, wy); x.lineTo(wx + Math.cos(aa) * 4.5, wy + Math.sin(aa) * 4.5); } x.stroke(); });
+  x.font = "700 7.5px 'JetBrains Mono',monospace"; x.fillStyle = "#0e1a33"; x.fillText("RS-08", -36, 14.5);
+  x.restore();
+  // kiraan
+  x.font = "600 11px 'JetBrains Mono',monospace"; x.fillStyle = "rgba(190,200,225,.75)"; x.textAlign = "right"; x.fillText(`potholes tagged: ${MS.kira}`, w - 6, 16); x.textAlign = "left";
+}
+
 /* =================== GELUNG UTAMA =================== */
 let tAkhir = performance.now(), bingkai = 0;
 const pipC = $("#pip").getContext("2d"), besar = $("#pipBesar"), bgC = besar.getContext("2d"); besar.width = W; besar.height = H;
@@ -2006,6 +2131,7 @@ function mini3D() { const c = B3.c, cw = c.width, ch = c.height; let sw = cw * .
 function gelung(now) {
   const dt = Math.min(.1, (now - tAkhir) / 1000); tAkhir = now; bingkai++;
   // latar 3D
+  if (!$("#login").hidden) lukisMaskot(dt, now);
   if (S.set.bg && (!TELEFON || bingkai % 2 === 0)) lukis3D(TELEFON ? dt * 2 : dt, now);
   // kamera simulasi berjalan di latar belakang selepas log masuk
   if (S.masuk) {
@@ -2083,15 +2209,18 @@ function titikPin(kelas) { const t = $("#titik"); t.className = "titik" + (kelas
 function tekan(k) {
   if (performance.now() < LG.kunciHingga) return; ac();
   if (k === "b") LG.pin = LG.pin.slice(0, -1); else if (k === "c") LG.pin = ""; else if (LG.pin.length < 4) LG.pin += k;
-  bip(900 + LG.pin.length * 120, 45, .04); titikPin(); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = LG.pin.length ? "•".repeat(LG.pin.length) + " · " + (4 - LG.pin.length) + " to go" : "ENTER 4-DIGIT PIN";
+  bip(900 + LG.pin.length * 120, 45, .04); titikPin(); MS.tengok = 1; MS.ping = performance.now(); if (LG.pin.length === 1) cakapMaskot("I'm watching… 👀"); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = LG.pin.length ? "•".repeat(LG.pin.length) + " · " + (4 - LG.pin.length) + " to go" : "ENTER 4-DIGIT PIN";
   if (LG.pin.length === 4) setTimeout(sahkan, 180);
 }
 function sahkan() {
   if (LG.pin === PIN[S.peranan]) {
     titikPin("betul"); $("#lgStatus").className = "lgStatus ok"; $("#lgStatus").textContent = "✓ ACCESS GRANTED · " + NAMA[S.peranan].toUpperCase();
     [660, 880, 1320].forEach((f, i) => setTimeout(() => bip(f, 140, .06), i * 110));
-    setTimeout(masukApp, 900);
+    MS.fasa = "lulus"; MS.t0 = performance.now(); cakapMaskot("Let's roll! 🚀");
+    setTimeout(() => { const w = document.createElement("div"); w.className = "warp"; w.innerHTML = "<i></i><i></i><i></i><b>ACCESS GRANTED</b>"; document.body.append(w); setTimeout(() => w.remove(), 1800); }, 350);
+    setTimeout(masukApp, 1100);
   } else {
+    MS.fasa = "gagal"; MS.t0 = performance.now(); cakapMaskot(["Oops, wrong PIN!", "Hmm, try again 🤔", "That's not it 😅"][LG.salah % 3]);
     LG.salah++; titikPin("salah"); bip(180, 300, .1, "sawtooth"); $("#lgStatus").className = "lgStatus err";
     if (LG.salah >= 3) { LG.kunciHingga = performance.now() + 10000; LG.salah = 0; const t = setInterval(() => { const s = Math.ceil((LG.kunciHingga - performance.now()) / 1000); if (s <= 0) { clearInterval(t); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = "ENTER 4-DIGIT PIN"; } else $("#lgStatus").textContent = `⛔ LOCKED · try again in ${s} s`; }, 250); }
     else $("#lgStatus").textContent = `✕ WRONG PIN · ${3 - LG.salah} attempts left`;
@@ -2109,11 +2238,14 @@ function masukApp() {
   $("#cUser").textContent = "◉ " + NAMA[S.peranan] + " · 🔒";
   const j = new Date().getHours(); $("#salam").textContent = (j < 12 ? "Good morning" : j < 18 ? "Good afternoon" : "Good evening") + ", " + (S.peranan === "op" ? "Operator" : "Officer");
   pergi(S.peranan === "jkr" ? "portal" : "misi"); kemasSemua();
+  const app = $("#app"); app.classList.remove("masukApp"); void app.offsetWidth; $$("#app main:not([hidden]) .kaca, #app .rasmi").forEach((k, i) => k.style.animationDelay = (i * 70) + "ms"); app.classList.add("masukApp"); setTimeout(() => app.classList.remove("masukApp"), 2600);
+  ["#hJum", "#hKrit", "#hHantar", "#hIkj"].forEach(s => kiraNaik($(s)));
+
   if (S.set.muzik) muzik(true);
   setTimeout(() => cakap(S.peranan === "op" ? "Access granted. Welcome, operator. ROADSCAN eight patrol is starting." : "Access granted. Welcome to the J K R portal."), 500);
 }
 $("#cUser").onclick = () => $("#kunci").click();
-$("#kunci").onclick = () => { if (S.masuk && !$("#app").hidden) audit("Session locked"); document.body.classList.remove("liveBg"); $("#login").hidden = false;
+$("#kunci").onclick = () => { MS.fasa = "jalan"; MS.lubang = []; MS.pop = []; requestAnimationFrame(saizMaskot); if (S.masuk && !$("#app").hidden) audit("Session locked"); document.body.classList.remove("liveBg"); $("#login").hidden = false;
  $("#lgJam").hidden = false; $("#app").hidden = true; B3.mod = "login"; B3.sLogin = S.s; document.body.classList.remove("redup"); $("#lgStatus").className = "lgStatus"; $("#lgStatus").textContent = "SESSION LOCKED · ENTER PIN"; muzik(false); try { speechSynthesis.cancel(); } catch (e) { } if ($("#modal").open) $("#modal").close(); };
 setInterval(() => { const d = new Date(); $("#lgJam").innerHTML = `<b>${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</b><span>${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · Ipoh</span>`; }, 1000);
 
